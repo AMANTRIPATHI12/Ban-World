@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================================
 // PATHS
@@ -1060,7 +1060,7 @@ app.listen(
     () => {
 
         console.log(
-            `\nBackend running on http://localhost:${PORT}`
+            `\nBackend running on https://ban-world.onrender.com:${PORT}`
         );
 
         console.log(
