@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BanWorld — Ban Weak Words. Build Powerful Vocabulary.</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="app">
+
+        <!-- ============================= -->
+        <!-- HEADER                         -->
+        <!-- ============================= -->
+        <header class="game-header">
+            <div class="brand">
+                <span class="brand-main">BAN</span>
+                <span class="brand-accent">WORLD</span>
+            </div>
+            <div class="header-subtitle">
+                Ban Weak Words. Build Powerful Vocabulary.
+            </div>
+        </header>
+
+        <!-- ============================= -->
+        <!-- GAME STATS                     -->
+        <!-- ============================= -->
+        <section class="stats">
+            <div class="stat-card">
+                <span class="stat-label">SCORE</span>
+                <span id="score" class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">STREAK</span>
+                <span id="streak" class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">QUESTION</span>
+                <span id="questionNumber" class="stat-value">1</span>
+            </div>
+            <div class="stat-card timer-card">
+                <span class="stat-label">TIME</span>
+                <span id="timer" class="stat-value">15</span>
+            </div>
+        </section>
+
+        <!-- ============================= -->
+        <!-- PROGRESS BAR                   -->
+        <!-- ============================= -->
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- QUESTION                      -->
+        <!-- ============================= -->
+        <section class="question-section">
+            <div class="question-label">BAN THE BORING WORD</div>
+            <h1 id="questionText" class="question-text">Loading your challenge...</h1>
+            <p id="questionInstruction" class="question-instruction">
+                Replace the boring phrase with a stronger word.
+            </p>
+        </section>
+
+        <!-- ============================= -->
+        <!-- ANSWER OPTIONS                 -->
+        <!-- ============================= -->
+        <section id="options" class="options">
+            <button class="option" data-index="0">
+                <span class="option-letter">A</span>
+                <span class="option-text">Loading...</span>
+            </button>
+            <button class="option" data-index="1">
+                <span class="option-letter">B</span>
+                <span class="option-text">Loading...</span>
+            </button>
+            <button class="option" data-index="2">
+                <span class="option-letter">C</span>
+                <span class="option-text">Loading...</span>
+            </button>
+            <button class="option" data-index="3">
+                <span class="option-letter">D</span>
+                <span class="option-text">Loading...</span>
+            </button>
+        </section>
+
+        <!-- ============================= -->
+        <!-- FEEDBACK                      -->
+        <!-- ============================= -->
+        <section id="feedback" class="feedback hidden">
+            <div id="feedbackTitle" class="feedback-title"></div>
+            <div id="feedbackText" class="feedback-text"></div>
+            <button id="nextButton" class="next-button">NEXT WORD →</button>
+        </section>
+
+        <!-- ============================= -->
+        <!-- LOADING INDICATOR              -->
+        <!-- ============================= -->
+        <div id="loadingIndicator" class="loading-indicator hidden">
+            <span class="loading-dot"></span>
+            <span>Preparing more words...</span>
+        </div>
+
+        <!-- ============================= -->
+        <!-- GAME OVER                      -->
+        <!-- ============================= -->
+        <section id="gameOver" class="game-over hidden">
+            <div class="game-over-label">RUN COMPLETE</div>
+            <h2>You survived the boring-word apocalypse.</h2>
+            <div class="final-score">
+                <span>FINAL SCORE</span>
+                <strong id="finalScore">0</strong>
+            </div>
+            <div class="final-stats">
+                <div>
+                    <span>WORDS</span>
+                    <strong id="finalQuestions">0</strong>
+                </div>
+                <div>
+                    <span>BEST STREAK</span>
+                    <strong id="bestStreak">0</strong>
+                </div>
+            </div>
+            <button id="restartButton" class="restart-button">PLAY AGAIN</button>
+        </section>
+
+        <!-- ============================= -->
+        <!-- FOOTER                        -->
+        <!-- ============================= -->
+        <footer class="game-footer">
+            <span>BanWorld — Keep your vocabulary from being mid.</span>
+        </footer>
+
+    </main>
+
+    <!-- ============================= -->
+    <!-- JAVASCRIPT                     -->
+    <!-- ============================= -->
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

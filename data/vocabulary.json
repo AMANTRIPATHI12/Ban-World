@@ -1,0 +1,474 @@
+{
+  "vocabulary": [
+    {
+      "id": "quality_001",
+      "bad": "VERY GOOD",
+      "answer": "EXCELLENT",
+      "category": "quality",
+      "difficulty": 1,
+      "tip": "Excellent means extremely good.",
+      "contexts": ["during the competition", "at the event", "for a beginner"],
+      "subjects": ["The performance", "The project", "The presentation"]
+    },
+    {
+      "id": "quality_002",
+      "bad": "VERY GOOD",
+      "answer": "OUTSTANDING",
+      "category": "quality",
+      "difficulty": 2,
+      "tip": "Outstanding means exceptionally impressive.",
+      "contexts": ["under pressure", "during the competition", "in the final round"],
+      "subjects": ["The performance", "The player", "The project"]
+    },
+    {
+      "id": "quality_003",
+      "bad": "VERY GOOD",
+      "answer": "EXCEPTIONAL",
+      "category": "quality",
+      "difficulty": 2,
+      "tip": "Exceptional means unusually excellent.",
+      "contexts": ["for a beginner", "under pressure", "during the event"],
+      "subjects": ["The result", "The performance", "The project"]
+    },
+    {
+      "id": "quality_004",
+      "bad": "VERY GOOD",
+      "answer": "SUPERB",
+      "category": "quality",
+      "difficulty": 2,
+      "tip": "Superb means extremely impressive or excellent.",
+      "contexts": ["during the match", "at the event", "in the final round"],
+      "subjects": ["The performance", "The presentation", "The result"]
+    },
+    {
+      "id": "quality_005",
+      "bad": "VERY GOOD",
+      "answer": "BRILLIANT",
+      "category": "quality",
+      "difficulty": 2,
+      "tip": "Brilliant can describe something exceptionally clever or impressive.",
+      "contexts": ["under pressure", "during the challenge", "in the interview"],
+      "subjects": ["The solution", "The idea", "The answer"]
+    },
+    {
+      "id": "quality_006",
+      "bad": "VERY GOOD",
+      "answer": "IMPRESSIVE",
+      "category": "quality",
+      "difficulty": 1,
+      "tip": "Impressive means causing admiration.",
+      "contexts": ["for a beginner", "during the event", "in a short time"],
+      "subjects": ["The result", "The progress", "The performance"]
+    },
+    {
+      "id": "quality_007",
+      "bad": "VERY BAD",
+      "answer": "TERRIBLE",
+      "category": "quality",
+      "difficulty": 1,
+      "tip": "Terrible means extremely bad.",
+      "contexts": ["during the match", "under pressure", "at the event"],
+      "subjects": ["The performance", "The result", "The mistake"]
+    },
+    {
+      "id": "quality_008",
+      "bad": "VERY BAD",
+      "answer": "HORRIBLE",
+      "category": "quality",
+      "difficulty": 1,
+      "tip": "Horrible means extremely unpleasant or bad.",
+      "contexts": ["during the trip", "after the accident", "at the event"],
+      "subjects": ["The experience", "The result", "The situation"]
+    },
+    {
+      "id": "size_001",
+      "bad": "VERY BIG",
+      "answer": "ENORMOUS",
+      "category": "size",
+      "difficulty": 1,
+      "tip": "Enormous means extremely large.",
+      "contexts": ["in the city", "near the stadium", "in the distance"],
+      "subjects": ["The building", "The crowd", "The structure"]
+    },
+    {
+      "id": "size_002",
+      "bad": "VERY BIG",
+      "answer": "MASSIVE",
+      "category": "size",
+      "difficulty": 1,
+      "tip": "Massive means extremely large or heavy.",
+      "contexts": ["in the center", "near the coast", "during the event"],
+      "subjects": ["The building", "The machine", "The crowd"]
+    },
+    {
+      "id": "size_003",
+      "bad": "VERY SMALL",
+      "answer": "TINY",
+      "category": "size",
+      "difficulty": 1,
+      "tip": "Tiny means extremely small.",
+      "contexts": ["on the table", "inside the box", "near the window"],
+      "subjects": ["The object", "The device", "The insect"]
+    },
+    {
+      "id": "size_004",
+      "bad": "VERY SMALL",
+      "answer": "MINUSCULE",
+      "category": "size",
+      "difficulty": 3,
+      "tip": "Minuscule means extremely small.",
+      "contexts": ["under the microscope", "on the screen", "inside the sample"],
+      "subjects": ["The particle", "The detail", "The object"]
+    },
+    {
+      "id": "speed_001",
+      "bad": "VERY FAST",
+      "answer": "RAPID",
+      "category": "speed",
+      "difficulty": 1,
+      "tip": "Rapid means happening very quickly.",
+      "contexts": ["during the race", "under pressure", "within seconds"],
+      "subjects": ["The movement", "The response", "The change"]
+    },
+    {
+      "id": "speed_002",
+      "bad": "VERY FAST",
+      "answer": "SWIFT",
+      "category": "speed",
+      "difficulty": 2,
+      "tip": "Swift means moving or happening quickly.",
+      "contexts": ["during the match", "under pressure", "without warning"],
+      "subjects": ["The response", "The movement", "The decision"]
+    },
+    {
+      "id": "speed_003",
+      "bad": "VERY SLOW",
+      "answer": "SLUGGISH",
+      "category": "speed",
+      "difficulty": 2,
+      "tip": "Sluggish means slow or lacking energy.",
+      "contexts": ["in the morning", "after lunch", "during the test"],
+      "subjects": ["The system", "The response", "The performance"]
+    },
+    {
+      "id": "happiness_001",
+      "bad": "VERY HAPPY",
+      "answer": "DELIGHTED",
+      "category": "emotion",
+      "difficulty": 1,
+      "tip": "Delighted means extremely pleased or happy.",
+      "contexts": ["after the announcement", "at the celebration", "after winning"],
+      "subjects": ["The student", "The winner", "The team"]
+    },
+    {
+      "id": "happiness_002",
+      "bad": "VERY HAPPY",
+      "answer": "ECSTATIC",
+      "category": "emotion",
+      "difficulty": 2,
+      "tip": "Ecstatic means extremely happy and excited.",
+      "contexts": ["after winning", "during the celebration", "after hearing the news"],
+      "subjects": ["The player", "The team", "The winner"]
+    },
+    {
+      "id": "sadness_001",
+      "bad": "VERY SAD",
+      "answer": "MISERABLE",
+      "category": "emotion",
+      "difficulty": 2,
+      "tip": "Miserable means extremely unhappy.",
+      "contexts": ["after the loss", "during the storm", "after the news"],
+      "subjects": ["The player", "The student", "The team"]
+    },
+    {
+      "id": "anger_001",
+      "bad": "VERY ANGRY",
+      "answer": "FURIOUS",
+      "category": "emotion",
+      "difficulty": 1,
+      "tip": "Furious means extremely angry.",
+      "contexts": ["after the mistake", "during the argument", "after the decision"],
+      "subjects": ["The coach", "The customer", "The manager"]
+    },
+    {
+      "id": "fear_001",
+      "bad": "VERY SCARED",
+      "answer": "TERRIFIED",
+      "category": "emotion",
+      "difficulty": 1,
+      "tip": "Terrified means extremely frightened.",
+      "contexts": ["during the storm", "in the dark", "after hearing the noise"],
+      "subjects": ["The child", "The traveler", "The student"]
+    },
+    {
+      "id": "intelligence_001",
+      "bad": "VERY SMART",
+      "answer": "BRILLIANT",
+      "category": "intelligence",
+      "difficulty": 1,
+      "tip": "Brilliant can mean extremely intelligent.",
+      "contexts": ["during the interview", "while solving the problem", "in the competition"],
+      "subjects": ["The student", "The candidate", "The programmer"]
+    },
+    {
+      "id": "intelligence_002",
+      "bad": "VERY SMART",
+      "answer": "BRIGHT",
+      "category": "intelligence",
+      "difficulty": 1,
+      "tip": "Bright can describe someone intelligent or quick to learn.",
+      "contexts": ["in class", "during the interview", "while learning"],
+      "subjects": ["The student", "The candidate", "The intern"]
+    },
+    {
+      "id": "difficulty_001",
+      "bad": "VERY HARD",
+      "answer": "DIFFICULT",
+      "category": "difficulty",
+      "difficulty": 1,
+      "tip": "Difficult means not easy to do or understand.",
+      "contexts": ["for beginners", "during the exam", "under pressure"],
+      "subjects": ["The question", "The problem", "The challenge"]
+    },
+    {
+      "id": "difficulty_002",
+      "bad": "VERY HARD",
+      "answer": "ARDUOUS",
+      "category": "difficulty",
+      "difficulty": 3,
+      "tip": "Arduous means requiring a lot of effort.",
+      "contexts": ["over several hours", "during the project", "under pressure"],
+      "subjects": ["The task", "The journey", "The process"]
+    },
+    {
+      "id": "ease_001",
+      "bad": "VERY EASY",
+      "answer": "EFFORTLESS",
+      "category": "difficulty",
+      "difficulty": 2,
+      "tip": "Effortless means requiring little or no effort.",
+      "contexts": ["for an expert", "during practice", "after enough training"],
+      "subjects": ["The task", "The solution", "The movement"]
+    },
+    {
+      "id": "importance_001",
+      "bad": "VERY IMPORTANT",
+      "answer": "CRUCIAL",
+      "category": "importance",
+      "difficulty": 1,
+      "tip": "Crucial means extremely important.",
+      "contexts": ["before the final", "during the interview", "for the project"],
+      "subjects": ["The decision", "The information", "The step"]
+    },
+    {
+      "id": "importance_002",
+      "bad": "VERY IMPORTANT",
+      "answer": "VITAL",
+      "category": "importance",
+      "difficulty": 1,
+      "tip": "Vital means absolutely necessary or important.",
+      "contexts": ["for the project", "during an emergency", "before launch"],
+      "subjects": ["The information", "The resource", "The decision"]
+    },
+    {
+      "id": "beauty_001",
+      "bad": "VERY BEAUTIFUL",
+      "answer": "GORGEOUS",
+      "category": "appearance",
+      "difficulty": 1,
+      "tip": "Gorgeous means extremely beautiful.",
+      "contexts": ["at sunset", "in the photograph", "during the ceremony"],
+      "subjects": ["The view", "The landscape", "The scene"]
+    },
+    {
+      "id": "beauty_002",
+      "bad": "VERY BEAUTIFUL",
+      "answer": "STUNNING",
+      "category": "appearance",
+      "difficulty": 1,
+      "tip": "Stunning means extremely attractive or impressive.",
+      "contexts": ["at sunset", "in the photograph", "from a distance"],
+      "subjects": ["The view", "The design", "The building"]
+    },
+    {
+      "id": "temperature_001",
+      "bad": "VERY HOT",
+      "answer": "SCORCHING",
+      "category": "temperature",
+      "difficulty": 2,
+      "tip": "Scorching means extremely hot.",
+      "contexts": ["during the afternoon", "in the desert", "during summer"],
+      "subjects": ["The weather", "The afternoon", "The temperature"]
+    },
+    {
+      "id": "temperature_002",
+      "bad": "VERY COLD",
+      "answer": "FREEZING",
+      "category": "temperature",
+      "difficulty": 1,
+      "tip": "Freezing means extremely cold.",
+      "contexts": ["during winter", "at night", "in the mountains"],
+      "subjects": ["The weather", "The temperature", "The air"]
+    },
+    {
+      "id": "noise_001",
+      "bad": "VERY LOUD",
+      "answer": "DEAFENING",
+      "category": "sound",
+      "difficulty": 2,
+      "tip": "Deafening means extremely loud.",
+      "contexts": ["during the concert", "near the stadium", "during the explosion"],
+      "subjects": ["The music", "The noise", "The sound"]
+    },
+    {
+      "id": "quiet_001",
+      "bad": "VERY QUIET",
+      "answer": "SILENT",
+      "category": "sound",
+      "difficulty": 1,
+      "tip": "Silent means completely quiet.",
+      "contexts": ["late at night", "during the exam", "inside the library"],
+      "subjects": ["The room", "The hallway", "The classroom"]
+    },
+    {
+      "id": "tired_001",
+      "bad": "VERY TIRED",
+      "answer": "EXHAUSTED",
+      "category": "energy",
+      "difficulty": 1,
+      "tip": "Exhausted means extremely tired.",
+      "contexts": ["after the marathon", "after working all day", "after the journey"],
+      "subjects": ["The runner", "The worker", "The traveler"]
+    },
+    {
+      "id": "hungry_001",
+      "bad": "VERY HUNGRY",
+      "answer": "STARVING",
+      "category": "physical",
+      "difficulty": 1,
+      "tip": "Starving is an informal way to say extremely hungry.",
+      "contexts": ["after the workout", "after the journey", "before dinner"],
+      "subjects": ["The athlete", "The traveler", "The student"]
+    },
+    {
+      "id": "dirty_001",
+      "bad": "VERY DIRTY",
+      "answer": "FILTHY",
+      "category": "condition",
+      "difficulty": 1,
+      "tip": "Filthy means extremely dirty.",
+      "contexts": ["after the trip", "after the storm", "outside the building"],
+      "subjects": ["The car", "The shoes", "The floor"]
+    },
+    {
+      "id": "clean_001",
+      "bad": "VERY CLEAN",
+      "answer": "SPOTLESS",
+      "category": "condition",
+      "difficulty": 2,
+      "tip": "Spotless means completely clean.",
+      "contexts": ["after cleaning", "before the inspection", "after the renovation"],
+      "subjects": ["The room", "The kitchen", "The office"]
+    },
+    {
+      "id": "interesting_001",
+      "bad": "VERY INTERESTING",
+      "answer": "FASCINATING",
+      "category": "interest",
+      "difficulty": 2,
+      "tip": "Fascinating means extremely interesting.",
+      "contexts": ["during the lecture", "while researching", "in the documentary"],
+      "subjects": ["The topic", "The discovery", "The story"]
+    },
+    {
+      "id": "boring_001",
+      "bad": "VERY BORING",
+      "answer": "TEDIOUS",
+      "category": "interest",
+      "difficulty": 2,
+      "tip": "Tedious means boring because it is repetitive or takes too long.",
+      "contexts": ["after several hours", "during the lecture", "while waiting"],
+      "subjects": ["The task", "The lecture", "The process"]
+    },
+    {
+      "id": "old_001",
+      "bad": "VERY OLD",
+      "answer": "ANCIENT",
+      "category": "age",
+      "difficulty": 1,
+      "tip": "Ancient means belonging to a very distant past.",
+      "contexts": ["in the museum", "near the ruins", "in the history book"],
+      "subjects": ["The artifact", "The structure", "The civilization"]
+    },
+    {
+      "id": "new_001",
+      "bad": "VERY NEW",
+      "answer": "RECENT",
+      "category": "age",
+      "difficulty": 1,
+      "tip": "Recent means having happened or appeared not long ago.",
+      "contexts": ["in the latest update", "this month", "in the news"],
+      "subjects": ["The change", "The development", "The update"]
+    },
+    {
+      "id": "important_003",
+      "bad": "VERY USEFUL",
+      "answer": "VALUABLE",
+      "category": "utility",
+      "difficulty": 1,
+      "tip": "Valuable means very useful or important.",
+      "contexts": ["during the project", "for beginners", "in an emergency"],
+      "subjects": ["The information", "The advice", "The tool"]
+    },
+    {
+      "id": "danger_001",
+      "bad": "VERY DANGEROUS",
+      "answer": "HAZARDOUS",
+      "category": "danger",
+      "difficulty": 2,
+      "tip": "Hazardous means involving danger or risk.",
+      "contexts": ["during construction", "near the site", "without proper equipment"],
+      "subjects": ["The material", "The environment", "The condition"]
+    },
+    {
+      "id": "power_001",
+      "bad": "VERY STRONG",
+      "answer": "POWERFUL",
+      "category": "strength",
+      "difficulty": 1,
+      "tip": "Powerful means having great strength or force.",
+      "contexts": ["during the match", "under pressure", "in the final round"],
+      "subjects": ["The player", "The engine", "The argument"]
+    },
+    {
+      "id": "weak_001",
+      "bad": "VERY WEAK",
+      "answer": "FRAIL",
+      "category": "strength",
+      "difficulty": 2,
+      "tip": "Frail means physically weak or delicate.",
+      "contexts": ["after the illness", "with age", "under pressure"],
+      "subjects": ["The structure", "The branch", "The person"]
+    },
+    {
+      "id": "rich_001",
+      "bad": "VERY RICH",
+      "answer": "WEALTHY",
+      "category": "wealth",
+      "difficulty": 1,
+      "tip": "Wealthy means having a lot of money or valuable possessions.",
+      "contexts": ["in the city", "according to the report", "over several years"],
+      "subjects": ["The investor", "The entrepreneur", "The family"]
+    },
+    {
+      "id": "poor_001",
+      "bad": "VERY POOR",
+      "answer": "IMPOVERISHED",
+      "category": "wealth",
+      "difficulty": 3,
+      "tip": "Impoverished means extremely poor.",
+      "contexts": ["after the crisis", "in the region", "according to the report"],
+      "subjects": ["The community", "The region", "The population"]
+    }
+  ]
+}

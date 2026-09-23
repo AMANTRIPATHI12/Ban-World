@@ -1,0 +1,172 @@
+{
+  "templates": [
+    {
+      "id": "template_001",
+      "category": "quality",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The performance", "The project", "The presentation"],
+      "contexts": ["during the competition", "under pressure", "for a beginner"]
+    },
+    {
+      "id": "template_002",
+      "category": "quality",
+      "text": "Everyone agreed that {subject} was {bad} {context}.",
+      "subjects": ["The performance", "The result", "The presentation"],
+      "contexts": ["during the event", "after the final round", "for the audience"]
+    },
+    {
+      "id": "template_003",
+      "category": "quality",
+      "text": "The judges thought {subject} was {bad} {context}.",
+      "subjects": ["The performance", "The solution", "The presentation"],
+      "contexts": ["during the competition", "under pressure", "in the final round"]
+    },
+    {
+      "id": "template_004",
+      "category": "size",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The building", "The crowd", "The structure"],
+      "contexts": ["in the city", "near the stadium", "from a distance"]
+    },
+    {
+      "id": "template_005",
+      "category": "speed",
+      "text": "{subject} happened {bad} {context}.",
+      "subjects": ["The response", "The change", "The movement"],
+      "contexts": ["during the race", "under pressure", "within seconds"]
+    },
+    {
+      "id": "template_006",
+      "category": "emotion",
+      "text": "{subject} felt {bad} {context}.",
+      "subjects": ["The student", "The player", "The winner"],
+      "contexts": ["after winning", "after the announcement", "during the celebration"]
+    },
+    {
+      "id": "template_007",
+      "category": "emotion",
+      "text": "After hearing the news, {subject} became {bad}.",
+      "subjects": ["The student", "The player", "The manager"],
+      "contexts": ["immediately", "during the meeting", "after the announcement"]
+    },
+    {
+      "id": "template_008",
+      "category": "intelligence",
+      "text": "{subject} gave a {bad} answer {context}.",
+      "subjects": ["The student", "The candidate", "The programmer"],
+      "contexts": ["during the interview", "while solving the problem", "in the competition"]
+    },
+    {
+      "id": "template_009",
+      "category": "difficulty",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The question", "The problem", "The challenge"],
+      "contexts": ["for beginners", "during the exam", "under pressure"]
+    },
+    {
+      "id": "template_010",
+      "category": "importance",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The decision", "The information", "The step"],
+      "contexts": ["before the final", "during the interview", "for the project"]
+    },
+    {
+      "id": "template_011",
+      "category": "appearance",
+      "text": "{subject} looked {bad} {context}.",
+      "subjects": ["The view", "The landscape", "The building"],
+      "contexts": ["at sunset", "in the photograph", "from a distance"]
+    },
+    {
+      "id": "template_012",
+      "category": "temperature",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The weather", "The afternoon", "The temperature"],
+      "contexts": ["during summer", "in the desert", "during winter"]
+    },
+    {
+      "id": "template_013",
+      "category": "sound",
+      "text": "{subject} became {bad} {context}.",
+      "subjects": ["The music", "The noise", "The sound"],
+      "contexts": ["during the concert", "near the stadium", "during the event"]
+    },
+    {
+      "id": "template_014",
+      "category": "energy",
+      "text": "{subject} looked {bad} {context}.",
+      "subjects": ["The runner", "The worker", "The traveler"],
+      "contexts": ["after the marathon", "after working all day", "after the journey"]
+    },
+    {
+      "id": "template_015",
+      "category": "physical",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The athlete", "The traveler", "The student"],
+      "contexts": ["after the workout", "after the journey", "before dinner"]
+    },
+    {
+      "id": "template_016",
+      "category": "condition",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The car", "The shoes", "The floor"],
+      "contexts": ["after the trip", "after the storm", "outside the building"]
+    },
+    {
+      "id": "template_017",
+      "category": "condition",
+      "text": "{subject} looked {bad} {context}.",
+      "subjects": ["The room", "The kitchen", "The office"],
+      "contexts": ["after cleaning", "before the inspection", "after the renovation"]
+    },
+    {
+      "id": "template_018",
+      "category": "interest",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The topic", "The discovery", "The story"],
+      "contexts": ["during the lecture", "while researching", "in the documentary"]
+    },
+    {
+      "id": "template_019",
+      "category": "age",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The artifact", "The structure", "The civilization"],
+      "contexts": ["in the museum", "near the ruins", "in the history book"]
+    },
+    {
+      "id": "template_020",
+      "category": "utility",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The information", "The advice", "The tool"],
+      "contexts": ["during the project", "for beginners", "in an emergency"]
+    },
+    {
+      "id": "template_021",
+      "category": "danger",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The material", "The environment", "The condition"],
+      "contexts": ["during construction", "near the site", "without proper equipment"]
+    },
+    {
+      "id": "template_022",
+      "category": "strength",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The player", "The engine", "The argument"],
+      "contexts": ["during the match", "under pressure", "in the final round"]
+    },
+    {
+      "id": "template_023",
+      "category": "wealth",
+      "text": "{subject} was {bad} {context}.",
+      "subjects": ["The investor", "The entrepreneur", "The family"],
+      "contexts": ["according to the report", "over several years", "in the city"]
+    },
+    {
+      "id": "template_024",
+      "category": "general",
+      "text": "Compared with the others, {subject} was {bad} {context}.",
+      "subjects": ["The result", "The performance", "The solution"],
+      "contexts": ["by a huge margin", "during the challenge", "in the final round"]
+    }
+  ]
+}

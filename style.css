@@ -1,0 +1,571 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* ============================================================
+   RESET
+============================================================ */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: #0b0e14; /* Dark navy from WordUp */
+    color: #ffffff;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+/* ============================================================
+   VARIABLES (Updated Color Theme)
+============================================================ */
+:root {
+    --bg: #0b0e14;
+    --panel: #151823;
+    --panel2: #1c2030;
+    --text: #ffffff;
+    --muted: #9da1b5;
+    
+    /* New WordUp-inspired palette */
+    --pink: #7c5dfa;    /* Primary Purple */
+    --cyan: #48e8ff;    /* Bright Blue */
+    --lime: #2ecc71;    /* Success Green */
+    --yellow: #ffd75a;  /* Warning Yellow */
+    --red: #ff5470;     /* Error Red */
+    --purple: #7c5dfa;  /* Main Accent */
+}
+
+/* ============================================================
+   BACKGROUND
+============================================================ */
+body {
+    position: relative;
+    background:
+        radial-gradient(circle at 10% 10%, rgba(124, 93, 250, .15), transparent 25%),
+        radial-gradient(circle at 88% 18%, rgba(72, 232, 255, .1), transparent 24%),
+        radial-gradient(circle at 75% 85%, rgba(124, 93, 250, .1), transparent 30%),
+        #0b0e14;
+}
+
+/* ============================================================
+   APP
+============================================================ */
+.app {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: linear-gradient(rgba(255,255,255,.01), rgba(255,255,255,.01));
+}
+
+/* subtle grid */
+.app::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+    z-index: 0;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.game-header {
+    width: 100%;
+    min-height: 105px;
+    padding: 28px clamp(24px, 5vw, 70px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    z-index: 3;
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    line-height: .9;
+    letter-spacing: -1.8px;
+}
+
+.brand-main {
+    font-size: clamp(17px, 1.5vw, 25px);
+    color: #ffffff;
+}
+
+.brand-accent {
+    font-size: clamp(21px, 2.1vw, 34px);
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 25px rgba(124, 93, 250, .2);
+}
+
+.header-subtitle {
+    padding: 9px 16px;
+    border: 1px solid rgba(255,255,255,.13);
+    background: rgba(255,255,255,.045);
+    border-radius: 999px;
+    color: #dfe2f0;
+    font-size: clamp(10px, 1vw, 15px);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   STATS
+============================================================ */
+.stats {
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    position: relative;
+    z-index: 2;
+}
+
+.stat-card {
+    min-height: 72px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(21, 24, 35, .75);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,.18);
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.8px;
+}
+
+.stat-value {
+    margin-top: 3px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.stat-card:nth-child(1) .stat-value { color: var(--lime); }
+.stat-card:nth-child(2) .stat-value { color: var(--pink); }
+.stat-card:nth-child(3) .stat-value { color: var(--cyan); }
+.timer-card .stat-value { color: var(--yellow); }
+
+/* ============================================================
+   PROGRESS
+============================================================ */
+.progress-container {
+    width: min(1100px, calc(100% - 40px));
+    height: 7px;
+    margin: 16px auto 0;
+    background: #202331;
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    box-shadow: 0 0 18px rgba(124,93,250,.25);
+    transition: width .35s linear;
+}
+
+/* ============================================================
+   QUESTION AREA
+============================================================ */
+.question-section {
+    width: min(1100px, calc(100% - 40px));
+    margin: 5vh auto 0;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.question-label {
+    margin-bottom: 14px;
+    color: var(--cyan);
+    font-size: clamp(11px, 1vw, 16px);
+    letter-spacing: 3px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.question-text {
+    margin: 0 auto;
+    max-width: 1050px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(27px, 3.3vw, 58px);
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -2px;
+}
+
+.question-instruction {
+    margin: 18px auto 0;
+    max-width: 750px;
+    color: var(--muted);
+    font-size: clamp(13px, 1.2vw, 18px);
+    line-height: 1.5;
+}
+
+/* ============================================================
+   BORING WORD
+============================================================ */
+.badword {
+    display: inline-block;
+    color: #ff6b7f;
+    background: rgba(255,84,112,.1);
+    border: 1px solid rgba(255,84,112,.3);
+    padding: 2px 12px;
+    margin: 0 3px;
+    border-radius: 10px;
+    text-decoration: line-through;
+    text-decoration-thickness: 3px;
+    box-shadow: 0 0 20px rgba(255,84,112,.05);
+}
+
+/* ============================================================
+   OPTIONS
+============================================================ */
+.options {
+    width: min(1100px, calc(100% - 40px));
+    margin: 3.5vh auto 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    position: relative;
+    z-index: 2;
+}
+
+.option {
+    position: relative;
+    min-height: 78px;
+    padding: 16px 16px 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: linear-gradient(145deg, rgba(28, 32, 48, .94), rgba(15, 18, 28, .96));
+    color: #ffffff;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(14px, 1.25vw, 20px);
+    font-weight: 800;
+    text-align: left;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.option:hover:not(:disabled) {
+    transform: translateY(-4px);
+    border-color: rgba(124, 93, 250, .6);
+    background: #1c2030;
+    box-shadow: 0 12px 35px rgba(0,0,0,.3);
+}
+
+.option:active:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.option-letter {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: rgba(255,255,255,.07);
+    color: #aeb3c7;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.option-text {
+    overflow-wrap: anywhere;
+}
+
+.option.correct {
+    background: rgba(46, 204, 113, .14);
+    border-color: var(--lime);
+    color: var(--lime);
+    box-shadow: 0 0 45px rgba(46, 204, 113, .18), inset 0 0 30px rgba(46, 204, 113, .06);
+}
+
+.option.correct .option-letter {
+    background: rgba(46, 204, 113, .15);
+    color: var(--lime);
+}
+
+.option.wrong {
+    background: rgba(255,84,112,.13);
+    border-color: var(--red);
+    color: #ff8395;
+    box-shadow: 0 0 35px rgba(255,84,112,.16);
+}
+
+.option.wrong .option-letter {
+    background: rgba(255,84,112,.15);
+    color: #ff8395;
+}
+
+.option:disabled {
+    cursor: default;
+}
+
+/* ============================================================
+   FEEDBACK
+============================================================ */
+.feedback {
+    width: min(800px, calc(100% - 40px));
+    margin: 2.5vh auto 0;
+    padding: 18px 24px;
+    text-align: center;
+    border-radius: 16px;
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.08);
+    position: relative;
+    z-index: 2;
+}
+
+.feedback-title {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(18px, 1.6vw, 26px);
+    font-weight: 900;
+    margin-bottom: 6px;
+}
+
+.feedback-text {
+    color: #bfc3d4;
+    font-size: clamp(13px, 1vw, 16px);
+    line-height: 1.5;
+}
+
+/* ============================================================
+   NEXT BUTTON
+============================================================ */
+.next-button {
+    margin-top: 15px;
+    padding: 12px 22px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(90deg, var(--purple), #5a3df0);
+    color: white;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(124, 93, 250, .18);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.next-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 35px rgba(124, 93, 250, .28);
+}
+
+/* ============================================================
+   LOADING
+============================================================ */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 18px auto;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+}
+
+.loading-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 15px var(--cyan);
+    animation: loadingPulse 1s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+    0%, 100% { transform: scale(.7); opacity: .5; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.game-footer {
+    margin-top: auto;
+    padding: 25px;
+    text-align: center;
+    color: #777c92;
+    font-size: 12px;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================================
+   GAME OVER
+============================================================ */
+.game-over {
+    width: min(700px, calc(100% - 40px));
+    margin: 40px auto;
+    padding: 45px 30px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 28px;
+    background: radial-gradient(circle at 50% 0%, rgba(124, 93, 250, .12), transparent 40%), #0e111b;
+    box-shadow: 0 30px 100px rgba(0,0,0,.55);
+    position: relative;
+    z-index: 10;
+}
+
+.game-over-label {
+    color: var(--cyan);
+    letter-spacing: 3px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.game-over h2 {
+    margin: 12px 0 25px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(28px, 4vw, 55px);
+    letter-spacing: -2px;
+}
+
+.final-score {
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    background: rgba(255,255,255,.04);
+}
+
+.final-score span {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.final-score strong {
+    display: block;
+    margin-top: 6px;
+    color: var(--lime);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 55px;
+}
+
+.final-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 15px;
+}
+
+.final-stats > div {
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    background: rgba(255,255,255,.035);
+}
+
+.final-stats span {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+}
+
+.final-stats strong {
+    display: block;
+    margin-top: 5px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 30px;
+}
+
+.restart-button {
+    margin-top: 22px;
+    padding: 14px 25px;
+    border: 0;
+    border-radius: 13px;
+    background: linear-gradient(90deg, var(--purple), #5a3df0);
+    color: #ffffff;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(124, 93, 250, .18);
+    transition: transform .18s ease;
+}
+
+.restart-button:hover {
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   HIDDEN
+============================================================ */
+.hidden {
+    display: none !important;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+@media (max-width: 850px) {
+    .game-header { padding: 22px 20px; min-height: 90px; }
+    .header-subtitle { display: none; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .options { grid-template-columns: repeat(2, 1fr); }
+    .question-section { margin-top: 4vh; }
+    .question-text { letter-spacing: -1px; }
+}
+
+@media (max-width: 600px) {
+    body { overflow-y: auto; }
+    .app { min-height: 100vh; overflow: visible; }
+    .game-header { padding: 20px 16px; }
+    .brand-accent { font-size: 24px; }
+    .stats { width: calc(100% - 24px); gap: 8px; }
+    .stat-card { min-height: 65px; padding: 10px 13px; }
+    .stat-value { font-size: 19px; }
+    .progress-container { width: calc(100% - 24px); }
+    .question-section { width: calc(100% - 24px); margin-top: 35px; }
+    .question-text { font-size: clamp(25px, 8vw, 38px); }
+    .question-instruction { font-size: 13px; }
+    .options { width: calc(100% - 24px); grid-template-columns: 1fr; gap: 10px; margin-top: 25px; }
+    .option { min-height: 68px; }
+    .feedback { width: calc(100% - 24px); }
+    .game-footer { padding: 25px 15px; }
+    .final-stats { grid-template-columns: 1fr; }
+}
