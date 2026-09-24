@@ -1,0 +1,787 @@
+/* ============================================================
+   ROOMS PAGE — COMPLETE STYLESHEET
+============================================================ */
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+.rooms-header {
+    width: min(900px, calc(100% - 40px));
+    margin: 20px auto 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.rooms-header h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(26px, 3vw, 36px);
+    margin: 0;
+    letter-spacing: -1px;
+}
+
+.close-btn {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.15);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: background .2s, border-color .2s;
+}
+
+.close-btn:hover {
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.35);
+}
+
+/* ============================================================
+   PANELS
+============================================================ */
+.rooms-panel {
+    width: min(900px, calc(100% - 40px));
+    margin: 0 auto 20px;
+    padding: 24px;
+    background: #151823;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================================
+   SIGNED-OUT PANEL
+============================================================ */
+.rooms-signed-out {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.signed-out-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.rooms-signed-out h3 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 24px;
+    margin: 0 0 10px;
+}
+
+.rooms-signed-out p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 460px;
+    margin: 0 auto 24px;
+}
+
+/* ============================================================
+   ROOMS ACTIONS (create / join row)
+============================================================ */
+.rooms-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.join-row {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.join-row input,
+#roomNameInput,
+#roomCodeInput {
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: #0b0e14;
+    color: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    outline: none;
+    transition: border-color .2s;
+}
+
+.join-row input:focus,
+#roomNameInput:focus,
+#roomCodeInput:focus {
+    border-color: var(--purple);
+}
+
+#roomNameInput {
+    width: 100%;
+    text-transform: none;
+    letter-spacing: normal;
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+   MODE TOGGLE
+============================================================ */
+.mode-btn {
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    background: #1c2030;
+    color: #9da1b5;
+    border: 1px solid rgba(255,255,255,.1);
+    transition: all .2s;
+}
+
+.mode-btn.active {
+    background: rgba(124,93,250,.2);
+    color: #fff;
+    border-color: var(--purple);
+}
+
+.question-mode {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.mode-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin: -10px 0 20px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   UNIFIED QUESTION BUILDER
+============================================================ */
+.question-builder {
+    margin: 20px 0 4px;
+    padding: 18px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 16px;
+}
+
+.question-builder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.qb-title {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--muted);
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+.question-counter {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 900;
+    font-family: "Space Grotesk", sans-serif;
+    background: rgba(255, 84, 112, .12);
+    color: var(--red);
+    border: 1px solid rgba(255, 84, 112, .3);
+    transition: background .2s, color .2s, border-color .2s;
+}
+
+.question-counter.valid {
+    background: rgba(46, 204, 113, .12);
+    color: var(--lime);
+    border-color: rgba(46, 204, 113, .35);
+}
+
+.question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 18px;
+    max-height: 560px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.question-list::-webkit-scrollbar {
+    width: 6px;
+}
+.question-list::-webkit-scrollbar-thumb {
+    background: rgba(124, 93, 250, .35);
+    border-radius: 3px;
+}
+.question-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.q-row {
+    padding: 16px;
+    background: #0b0e14;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    transition: border-color .2s ease;
+}
+
+.q-row:focus-within {
+    border-color: rgba(124, 93, 250, .45);
+}
+
+.q-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.q-number {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--purple);
+    letter-spacing: 1.5px;
+}
+
+.q-remove {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.35);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background .15s ease, color .15s ease;
+    font-family: inherit;
+}
+
+.q-remove:hover {
+    background: rgba(255, 84, 112, .15);
+    color: var(--red);
+}
+
+.q-text,
+.q-strike,
+.q-opt {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: #151823;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.q-text {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.q-strike {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.q-strike::placeholder,
+.q-text::placeholder,
+.q-opt::placeholder {
+    color: rgba(157, 161, 181, .5);
+}
+
+.q-text:focus,
+.q-strike:focus,
+.q-opt:focus {
+    border-color: var(--purple);
+    background: #1a1e2c;
+}
+
+.q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.q-option-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.q-radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.q-radio {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.25);
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: border-color .15s ease, background .15s ease;
+    flex-shrink: 0;
+}
+
+.q-radio:hover {
+    border-color: rgba(124, 93, 250, .7);
+}
+
+.q-radio:checked {
+    border-color: var(--lime);
+    background: var(--lime);
+    box-shadow: 0 0 12px rgba(46, 204, 113, .5);
+}
+
+.q-radio:checked::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: #0b0e14;
+}
+
+.q-opt-letter {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--muted);
+    min-width: 16px;
+}
+
+.question-builder-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.question-builder-actions .primary-btn,
+.question-builder-actions .secondary-btn {
+    flex: 1;
+    min-width: 160px;
+}
+
+.question-builder-actions .primary-btn:disabled,
+.question-builder-actions .secondary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ============================================================
+   FORM ACTIONS
+============================================================ */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* ============================================================
+   ERRORS
+============================================================ */
+.rooms-error {
+    color: var(--red);
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ============================================================
+   WAITING ROOM / ACTIVE ROOM
+============================================================ */
+.room-code-display {
+    text-align: center;
+    padding: 20px;
+    background: rgba(124,93,250,.1);
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.room-code-display span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.room-code-display strong {
+    display: block;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 36px;
+    letter-spacing: 6px;
+    color: var(--cyan);
+    margin-top: 8px;
+}
+
+.room-meta {
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.room-name {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.room-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    background: rgba(124, 93, 250, .15);
+    color: var(--purple);
+    border: 1px solid rgba(124, 93, 250, .4);
+}
+
+.room-players h4 {
+    margin: 0 0 14px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+}
+
+#waitingPlayerList,
+#roomPlayerList {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+#waitingPlayerList li,
+#roomPlayerList li {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+#waitingPlayerList li:last-child,
+#roomPlayerList li:last-child {
+    border-bottom: none;
+}
+
+.room-actions-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.waiting-hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 14px;
+}
+
+/* ============================================================
+   LOBBY ROLE TOGGLE
+============================================================ */
+.lobby-role-toggle {
+    margin: 20px 0 24px;
+    padding: 16px 18px;
+    background: rgba(124, 93, 250, .08);
+    border: 1px solid rgba(124, 93, 250, .25);
+    border-radius: 14px;
+}
+
+.lobby-role-label {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+/* ============================================================
+   ROLE BANNER (top of game panel)
+============================================================ */
+.room-role-banner {
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto 18px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 2;
+}
+
+.room-role-banner.player {
+    background: rgba(46, 204, 113, .1);
+    border: 1px solid rgba(46, 204, 113, .3);
+    color: var(--lime);
+}
+
+.room-role-banner.host {
+    background: rgba(255, 215, 90, .1);
+    border: 1px solid rgba(255, 215, 90, .3);
+    color: var(--yellow);
+}
+
+/* ============================================================
+   HOST CONTROLS
+============================================================ */
+.host-controls {
+    width: min(1100px, calc(100% - 40px));
+    margin: 26px auto 0;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================================
+   OPTION — Selected state (optimistic UI)
+============================================================ */
+.option.selected {
+    border-color: var(--purple);
+    background: rgba(124, 93, 250, .15);
+}
+
+.option.selected .option-letter {
+    background: rgba(124, 93, 250, .25);
+    color: #fff;
+}
+
+/* ============================================================
+   MINI LEADERBOARD (game view)
+============================================================ */
+.mini-leaderboard {
+    width: min(1100px, calc(100% - 40px));
+    margin: 36px auto 60px;
+    padding: 20px 24px;
+    background: rgba(21, 24, 35, .75);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    position: relative;
+    z-index: 2;
+}
+
+.mini-leaderboard h4 {
+    margin: 0 0 14px;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    font-weight: 900;
+}
+
+.mini-leaderboard ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mini-leaderboard li {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    align-items: center;
+}
+
+.mini-leaderboard li:last-child {
+    border-bottom: none;
+}
+
+.mini-leaderboard li.is-me {
+    color: var(--cyan);
+    font-weight: 700;
+}
+
+.mini-leaderboard .rank {
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.mini-leaderboard .score {
+    color: var(--lime);
+    font-weight: 900;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 16px;
+}
+
+/* ============================================================
+   TIMER CARD — urgent state
+============================================================ */
+.timer-card.urgent .stat-value {
+    color: var(--red) !important;
+}
+
+/* ============================================================
+   FINISHED VIEW
+============================================================ */
+.trophy-big {
+    font-size: 64px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.finished-title {
+    text-align: center;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 32px;
+    margin: 0 0 6px;
+}
+
+.finished-sub {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 24px;
+}
+
+.finished-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+}
+
+.finished-item {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.06);
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.finished-item.is-me {
+    background: rgba(72, 232, 255, .08);
+    border-color: rgba(72, 232, 255, .3);
+}
+
+.finished-item .medal {
+    font-size: 24px;
+    text-align: center;
+}
+
+.finished-item .name { font-weight: 700; }
+
+.finished-item .score {
+    color: var(--lime);
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+}
+
+/* ============================================================
+   RESPONSIVE — TABLET / MOBILE
+============================================================ */
+@media (max-width: 700px) {
+    .rooms-header {
+        width: calc(100% - 32px);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .rooms-panel {
+        width: calc(100% - 32px);
+        padding: 20px;
+    }
+
+    .rooms-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .join-row {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .join-row input {
+        flex: 1;
+    }
+
+    .question-mode {
+        flex-direction: column;
+    }
+
+    .question-builder {
+        padding: 14px;
+    }
+
+    .question-list {
+        max-height: 420px;
+    }
+
+    .q-row {
+        padding: 14px;
+    }
+
+    .question-builder-actions {
+        flex-direction: column;
+    }
+
+    .question-builder-actions .primary-btn,
+    .question-builder-actions .secondary-btn {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .room-role-banner,
+    .host-controls,
+    .mini-leaderboard {
+        width: calc(100% - 32px);
+    }
+
+    .finished-item {
+        grid-template-columns: 40px 1fr auto;
+        font-size: 14px;
+        padding: 12px;
+    }
+}

@@ -9,6 +9,7 @@ const APP_CONFIG = {
     MAX_QUESTIONS: 1000000,
     MAX_GENERATION_ATTEMPTS: 100,
     AUDIO_ENABLED: true,
+    MAX_ROOM_QUESTIONS: 20,
 
     // API Endpoints
     API_CONTENT_URL: "/api/content",

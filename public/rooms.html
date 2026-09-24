@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms — BanWorld</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/rooms.css">
+</head>
+
+<body>
+    <main class="app">
+
+        <!-- ============================= -->
+        <!-- HEADER                         -->
+        <!-- ============================= -->
+        <header class="game-header">
+            <div class="brand">
+                <span class="brand-main">BAN</span>
+                <span class="brand-accent">WORLD</span>
+            </div>
+
+            <div class="header-subtitle">
+                Ban Weak Words. Build Powerful Vocabulary.
+            </div>
+
+            <div class="header-actions">
+                <a href="play.html" class="rooms-nav-btn">Play</a>
+
+                <div class="auth-area hidden" id="authArea">
+                    <button id="googleSignInBtn" class="google-btn">
+                        <span class="google-icon">G</span>
+                        <span>Sign in</span>
+                    </button>
+                    <div id="userInfo" class="user-info hidden">
+                        <img id="userPhoto" class="user-photo" alt="avatar" />
+                        <span id="userName" class="user-name"></span>
+                        <button id="signOutBtn" class="signout-btn">Sign out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================= -->
+        <!-- PAGE HEADER                    -->
+        <!-- ============================= -->
+        <div class="rooms-header">
+            <h2>Rooms</h2>
+            <a href="index.html" class="close-btn">← Back to Home</a>
+        </div>
+
+        <!-- Signed-out prompt -->
+        <div id="roomsSignedOut" class="rooms-panel rooms-signed-out hidden">
+            <div class="signed-out-icon">🔒</div>
+            <h3>Sign in to use Rooms</h3>
+            <p>Create a room or join friends by code — you'll need to sign in with Google first.</p>
+            <button id="roomsSignInBtn" class="primary-btn">Sign in with Google</button>
+        </div>
+
+        <!-- ============================= -->
+        <!-- LOBBY: Create / Join           -->
+        <!-- ============================= -->
+        <div id="roomsControls" class="rooms-panel hidden">
+            <div class="rooms-actions">
+                <button id="createRoomBtn" class="primary-btn">+ Create Room</button>
+                <div class="join-row">
+                    <input id="roomCodeInput" type="text" placeholder="Enter 6-char code" maxlength="6" />
+                    <button id="joinRoomBtn" class="primary-btn">Join</button>
+                </div>
+            </div>
+            <p id="roomsError" class="rooms-error hidden"></p>
+        </div>
+
+        <!-- ============================= -->
+        <!-- CREATE ROOM FORM               -->
+        <!-- ============================= -->
+        <div id="createRoomForm" class="rooms-panel hidden">
+            <h3>Create a Room</h3>
+            <input id="roomNameInput" type="text" placeholder="Room name (optional)" />
+
+            <!-- ============================================== -->
+            <!-- ROLE SELECTOR — only shown to room creator      -->
+            <!-- ============================================== -->
+            <div class="question-mode" id="hostModeSelector">
+                <button id="modePlayerBtn" class="mode-btn active" data-mode="player">
+                    🎮 Play as Player
+                </button>
+                <button id="modeHostBtn" class="mode-btn" data-mode="host">
+                    👀 Spectate as Host
+                </button>
+            </div>
+            <p class="mode-hint" id="modeHint">
+                You'll play with everyone. Questions advance automatically when the timer ends.
+            </p>
+
+            <!-- ============================================== -->
+            <!-- UNIFIED QUESTION BUILDER                        -->
+            <!-- ============================================== -->
+            <div class="question-builder">
+                <div class="question-builder-header">
+                    <span class="qb-title">Questions</span>
+                    <span id="questionCounter" class="question-counter">0 / 20</span>
+                </div>
+
+                <div id="questionList" class="question-list"></div>
+
+                <div class="question-builder-actions">
+                    <button id="generateQsBtn" class="primary-btn">
+                        ⚡ Generate 6 more
+                    </button>
+                    <button id="addCustomQBtn" class="secondary-btn">
+                        + Add blank
+                    </button>
+                </div>
+
+                <p class="mode-hint" id="builderHint">
+                    Generate questions from our bank, then edit any of them freely.
+                    Minimum 5 to create a room, maximum 20.
+                </p>
+            </div>
+
+            <div class="form-actions">
+                <button id="confirmCreateBtn" class="primary-btn">Create Room</button>
+                <button id="cancelCreateBtn" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- WAITING ROOM (LOBBY)           -->
+        <!-- ============================= -->
+        <div id="waitingRoomPanel" class="rooms-panel hidden">
+            <div class="room-code-display">
+                <span>Room Code — Share with friends</span>
+                <strong id="waitingRoomCode"></strong>
+            </div>
+
+            <div class="room-meta">
+                <span id="waitingRoomName" class="room-name"></span>
+                <span id="waitingHostMode" class="room-badge"></span>
+            </div>
+
+            <!-- Creator-only: switch role before starting -->
+            <div id="lobbyRoleToggle" class="lobby-role-toggle hidden">
+                <p class="lobby-role-label">Your role in this room:</p>
+                <div class="question-mode">
+                    <button id="lobbyModePlayerBtn" class="mode-btn">🎮 Play as Player</button>
+                    <button id="lobbyModeHostBtn" class="mode-btn">👀 Spectate as Host</button>
+                </div>
+                <p class="mode-hint" id="lobbyModeHint"></p>
+            </div>
+
+            <div class="room-players">
+                <h4>Players (<span id="waitingPlayerCount">0</span>/40)</h4>
+                <ul id="waitingPlayerList"></ul>
+            </div>
+
+            <div class="room-actions-row">
+                <button id="startGameBtn" class="primary-btn hidden">▶ Start Game</button>
+                <button id="leaveRoomBtn" class="secondary-btn">Leave Room</button>
+            </div>
+
+            <p id="waitingHint" class="waiting-hint">
+                Waiting for the host to start…
+            </p>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- LIVE GAME — mirrors play.html exactly      -->
+        <!-- ========================================= -->
+        <div id="gamePanel" class="hidden">
+
+            <!-- Role banner -->
+            <div class="room-role-banner" id="roleBanner"></div>
+
+            <!-- STATS (same as play.html) -->
+            <section class="stats">
+                <div class="stat-card">
+                    <span class="stat-label">SCORE</span>
+                    <span id="score" class="stat-value">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">STREAK</span>
+                    <span id="streak" class="stat-value">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">QUESTION</span>
+                    <span id="questionNumber" class="stat-value">1</span>
+                </div>
+                <div class="stat-card timer-card" id="timerCard">
+                    <span class="stat-label">TIME</span>
+                    <span id="timer" class="stat-value">15</span>
+                </div>
+            </section>
+
+            <!-- PROGRESS BAR -->
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+            <!-- QUESTION -->
+            <section class="question-section">
+                <div class="question-label">BAN THE BORING WORD</div>
+                <h1 id="questionText" class="question-text">Loading…</h1>
+                <p id="questionInstruction" class="question-instruction">
+                    Replace the boring phrase with a stronger word.
+                </p>
+            </section>
+
+            <!-- OPTIONS -->
+            <section id="options" class="options">
+                <button class="option" data-index="0">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">Loading…</span>
+                </button>
+                <button class="option" data-index="1">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">Loading…</span>
+                </button>
+                <button class="option" data-index="2">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">Loading…</span>
+                </button>
+                <button class="option" data-index="3">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">Loading…</span>
+                </button>
+            </section>
+
+            <!-- FEEDBACK -->
+            <section id="feedback" class="feedback hidden">
+                <div id="feedbackTitle" class="feedback-title"></div>
+                <div id="feedbackText" class="feedback-text"></div>
+            </section>
+
+            <!-- HOST CONTROLS -->
+            <div class="host-controls" id="hostControls">
+                <button id="hostNextBtn" class="next-button hidden">
+                    NEXT QUESTION →
+                </button>
+                <button id="hostEndBtn" class="secondary-btn hidden">
+                    End Game
+                </button>
+            </div>
+
+            <!-- LIVE SCORES -->
+            <div class="mini-leaderboard" id="miniLeaderboard">
+                <h4>Live Scores</h4>
+                <ul id="gameScoreList"></ul>
+            </div>
+
+        </div>
+
+        <!-- ============================= -->
+        <!-- FINISHED VIEW                  -->
+        <!-- ============================= -->
+        <div id="finishedPanel" class="rooms-panel hidden">
+            <div class="trophy-big">🏆</div>
+            <h2 class="finished-title">Game Over!</h2>
+            <p class="finished-sub">Final Leaderboard</p>
+
+            <ul id="finishedList" class="finished-list"></ul>
+
+            <div class="room-actions-row">
+                <button id="backToLobbyBtn" class="primary-btn">Back to Rooms</button>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- FOOTER                        -->
+        <!-- ============================= -->
+        <footer class="game-footer">
+            <span>BanWorld — Keep your vocabulary from being mid.</span>
+        </footer>
+
+    </main>
+
+    <script src="config.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/rooms.js"></script>
+</body>
+</html>

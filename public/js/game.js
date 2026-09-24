@@ -1,4 +1,17 @@
 // ============================================================
+// INFINITE VOCABULARY MODE
+// ============================================================
+
+import {
+    randomItem,
+    shuffle,
+    escapeHTML,
+    normalizeText,
+    hashString
+} from "./main.js";
+import { authFetch, onAuthChange, getCurrentUser } from "./auth.js";
+
+// ============================================================
 // GAME STATE
 // ============================================================
 
@@ -19,6 +32,12 @@ const gameState = {
     ),
     generationCounter: 0
 };
+
+// Guard: this script only runs on play.html
+const isPlayPage = !!document.getElementById("options");
+if (!isPlayPage) {
+    console.warn("[game] play.html elements not found — skipping init.");
+}
 
 // ============================================================
 // DOM
@@ -52,9 +71,8 @@ const elements = {
 let audioContext = null;
 
 function initAudio() {
-    if (!APP_CONFIG.AUDIO_ENABLED) {
-        return;
-    }
+    if (!APP_CONFIG.AUDIO_ENABLED) return;
+
     if (!audioContext) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) {
@@ -63,26 +81,30 @@ function initAudio() {
         }
         audioContext = new AudioContext();
     }
+
     if (audioContext.state === "suspended") {
         audioContext.resume().catch(() => {});
     }
 }
 
 function playTone(frequency, duration = 0.1, type = "sine", volume = 0.05, delay = 0) {
-    if (!APP_CONFIG.AUDIO_ENABLED || !audioContext) {
-        return;
-    }
+    if (!APP_CONFIG.AUDIO_ENABLED || !audioContext) return;
+
     const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
+
     oscillator.type = type;
     oscillator.frequency.value = frequency;
     oscillator.connect(gain);
     gain.connect(audioContext.destination);
+
     const startTime = audioContext.currentTime + delay;
     const endTime = startTime + duration;
+
     gain.gain.setValueAtTime(0.0001, startTime);
     gain.gain.exponentialRampToValueAtTime(volume, startTime + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
     oscillator.start(startTime);
     oscillator.stop(endTime);
 }
@@ -119,39 +141,6 @@ function playGameOverSound() {
 }
 
 // ============================================================
-// UTILITY
-// ============================================================
-
-function randomItem(array) {
-    if (!array || array.length === 0) {
-        return "";
-    }
-    return array[Math.floor(Math.random() * array.length)];
-}
-
-function shuffle(array) {
-    const copy = [...array];
-    for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-}
-
-function escapeHTML(value) {
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function normalizeText(value) {
-    return String(value || "").trim().toUpperCase();
-}
-
-// ============================================================
 // COMPACT QUESTION TRACKING
 // ============================================================
 
@@ -163,23 +152,82 @@ function markQuestionUsed(id) {
     gameState.usedQuestionBits[Math.floor(id / 8)] |= 1 << (id % 8);
 }
 
-// ============================================================
-// HASH
-// ============================================================
-
-function hashString(text) {
-    let hash = 2166136261;
-    for (let i = 0; i < text.length; i++) {
-        hash ^= text.charCodeAt(i);
-        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-    }
-    return hash >>> 0;
-}
-
 function questionIdFromContent(vocabulary, template, subject, context, variation) {
     const raw = [vocabulary.id, template.id, subject, context, variation].join("|");
     return hashString(raw) % APP_CONFIG.MAX_QUESTIONS;
 }
+
+// ============================================================
+// USER PROFILE SYNC
+// ============================================================
+
+let profileLoaded = false;
+
+/**
+ * Fetch the signed-in user's profile from backend and pre-fill score/bestStreak.
+ * Called on page load and whenever the user signs in.
+ */
+async function loadUserProfile() {
+    if (!getCurrentUser()) {
+        // Not signed in → reset local stats
+        gameState.score = 0;
+        gameState.bestStreak = 0;
+        updateStats();
+        return;
+    }
+
+    try {
+        const res = await authFetch("/api/user/profile");
+        const data = await res.json();
+
+        if (!data.success || !data.profile) {
+            console.warn("[game] Could not load profile:", data.message);
+            return;
+        }
+
+        gameState.score = data.profile.totalScore || 0;
+        gameState.bestStreak = data.profile.bestStreak || 0;
+        profileLoaded = true;
+
+        updateStats();
+        console.log(
+            `[game] Loaded profile — totalScore: ${gameState.score}, bestStreak: ${gameState.bestStreak}`
+        );
+    } catch (err) {
+        console.warn("[game] Profile fetch failed:", err);
+    }
+}
+
+/**
+ * Save a score delta to the backend. Fire-and-forget — no await,
+ * so the game doesn't lag while the network call happens.
+ */
+async function saveScoreDelta(delta) {
+    if (!getCurrentUser() || delta <= 0) return;
+
+    try {
+        await authFetch("/api/user/score", {
+            method: "POST",
+            body: JSON.stringify({
+                deltaScore: delta,
+                bestStreak: gameState.bestStreak
+            })
+        });
+    } catch (err) {
+        console.warn("[game] Score save failed:", err);
+    }
+}
+
+// Subscribe to auth state — load profile on sign-in, reset on sign-out
+onAuthChange(async (user) => {
+    if (user) {
+        await loadUserProfile();
+    } else {
+        gameState.score = 0;
+        gameState.bestStreak = 0;
+        updateStats();
+    }
+});
 
 // ============================================================
 // CONTENT LOADING
@@ -217,12 +265,8 @@ async function loadLocalContent() {
         fetch(APP_CONFIG.LOCAL_TEMPLATES_URL)
     ]);
 
-    if (!vocabularyResponse.ok) {
-        throw new Error("Could not load vocabulary.json");
-    }
-    if (!templatesResponse.ok) {
-        throw new Error("Could not load templates.json");
-    }
+    if (!vocabularyResponse.ok) throw new Error("Could not load vocabulary.json");
+    if (!templatesResponse.ok) throw new Error("Could not load templates.json");
 
     const vocabularyData = await vocabularyResponse.json();
     const templatesData = await templatesResponse.json();
@@ -240,11 +284,9 @@ async function loadLocalContent() {
 
 function getCompatibleTemplates(vocabulary) {
     const categoryTemplates = gameState.templates.filter(
-        template => !template.category || template.category === vocabulary.category
+        (template) => !template.category || template.category === vocabulary.category
     );
-    if (categoryTemplates.length > 0) {
-        return categoryTemplates;
-    }
+    if (categoryTemplates.length > 0) return categoryTemplates;
     return gameState.templates;
 }
 
@@ -261,9 +303,7 @@ const sentenceVariations = [
 ];
 
 function applyVariation(sentence, variation) {
-    if (!variation) {
-        return sentence;
-    }
+    if (!variation) return sentence;
     const trimmed = sentence.trim();
     if (trimmed.endsWith(".") || trimmed.endsWith("!") || trimmed.endsWith("?")) {
         return trimmed.slice(0, -1) + ` ${variation}.`;
@@ -302,8 +342,9 @@ function buildSentence(vocabulary, template) {
 
 function getDistractors(correctVocabulary) {
     const possible = gameState.vocabulary.filter(
-        item => item.id !== correctVocabulary.id &&
-                normalizeText(item.answer) !== normalizeText(correctVocabulary.answer)
+        (item) =>
+            item.id !== correctVocabulary.id &&
+            normalizeText(item.answer) !== normalizeText(correctVocabulary.answer)
     );
     return shuffle(possible).slice(0, 12);
 }
@@ -320,33 +361,23 @@ function buildOptions(correctVocabulary) {
 // ============================================================
 
 function generateQuestion() {
-    if (gameState.questionsGenerated >= APP_CONFIG.MAX_QUESTIONS) {
-        return null;
-    }
+    if (gameState.questionsGenerated >= APP_CONFIG.MAX_QUESTIONS) return null;
 
     for (let attempt = 0; attempt < APP_CONFIG.MAX_GENERATION_ATTEMPTS; attempt++) {
         const vocabulary = randomItem(gameState.vocabulary);
-        if (!vocabulary) {
-            return null;
-        }
+        if (!vocabulary) return null;
 
         const templates = getCompatibleTemplates(vocabulary);
         const template = randomItem(templates);
-        if (!template) {
-            continue;
-        }
+        if (!template) continue;
 
         const built = buildSentence(vocabulary, template);
         const id = questionIdFromContent(vocabulary, template, built.subject, built.context, built.variation);
 
-        if (isQuestionUsed(id)) {
-            continue;
-        }
+        if (isQuestionUsed(id)) continue;
 
         const options = buildOptions(vocabulary);
-        if (options.length < 4) {
-            continue;
-        }
+        if (options.length < 4) continue;
 
         markQuestionUsed(id);
         gameState.questionsGenerated++;
@@ -420,9 +451,7 @@ function renderOptions(options) {
         text.textContent = option.answer;
 
         const letter = button.querySelector(".option-letter");
-        if (letter) {
-            letter.textContent = letters[index];
-        }
+        if (letter) letter.textContent = letters[index];
     });
 }
 
@@ -431,18 +460,17 @@ function renderOptions(options) {
 // ============================================================
 
 function handleAnswer(index) {
-    if (gameState.answered) {
-        return;
-    }
+    if (gameState.answered) return;
     gameState.answered = true;
     stopTimer();
     initAudio();
 
     const selected = gameState.currentQuestion.options[index];
-    const correct = normalizeText(selected.answer) === normalizeText(gameState.currentQuestion.answer);
+    const correct =
+        normalizeText(selected.answer) === normalizeText(gameState.currentQuestion.answer);
 
     const buttons = elements.options.querySelectorAll(".option");
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
         button.disabled = true;
         const answer = button.dataset.answer;
         if (normalizeText(answer) === normalizeText(gameState.currentQuestion.answer)) {
@@ -479,6 +507,9 @@ function handleCorrectAnswer() {
         gameState.currentQuestion.tip
     );
     updateStats();
+
+    // Save delta to backend (fire-and-forget)
+    saveScoreDelta(earned);
 }
 
 function handleWrongAnswer() {
@@ -517,9 +548,7 @@ function startTimer() {
     gameState.timerInterval = setInterval(() => {
         gameState.timer--;
         updateTimer();
-        if (gameState.timer <= 0) {
-            handleTimeout();
-        }
+        if (gameState.timer <= 0) handleTimeout();
     }, 1000);
 }
 
@@ -537,16 +566,14 @@ function updateTimer() {
 }
 
 function handleTimeout() {
-    if (gameState.answered) {
-        return;
-    }
+    if (gameState.answered) return;
     gameState.answered = true;
     stopTimer();
     gameState.streak = 0;
     playTimeoutSound();
 
     const buttons = elements.options.querySelectorAll(".option");
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
         button.disabled = true;
         const answer = button.dataset.answer;
         if (normalizeText(answer) === normalizeText(gameState.currentQuestion.answer)) {
@@ -567,9 +594,7 @@ function handleTimeout() {
 // ============================================================
 
 function nextQuestion() {
-    if (!gameState.answered) {
-        return;
-    }
+    if (!gameState.answered) return;
     playNextSound();
     gameState.questionNumber++;
     startQuestion();
@@ -597,12 +622,15 @@ function endGame() {
 // ============================================================
 // RESTART
 // ============================================================
+// Note: score & bestStreak are all-time cumulative (persisted).
+// Restart only resets the current session's streak counter.
+// ============================================================
 
 function restartGame() {
     stopTimer();
-    gameState.score = 0;
+
+    // Keep score & bestStreak — they're persisted to backend
     gameState.streak = 0;
-    gameState.bestStreak = 0;
     gameState.questionNumber = 1;
     gameState.currentQuestion = null;
     gameState.timer = APP_CONFIG.QUESTION_TIME;
@@ -634,9 +662,7 @@ function updateProgress() {
 }
 
 function showLoading(show) {
-    if (!elements.loadingIndicator) {
-        return;
-    }
+    if (!elements.loadingIndicator) return;
     elements.loadingIndicator.classList.toggle("hidden", !show);
 }
 
@@ -645,25 +671,18 @@ function showLoading(show) {
 // ============================================================
 
 function setupEvents() {
-    elements.options.addEventListener("click", event => {
+    elements.options.addEventListener("click", (event) => {
         const button = event.target.closest(".option");
-        if (!button) {
-            return;
-        }
+        if (!button) return;
         const index = Number(button.dataset.index);
         initAudio();
         handleAnswer(index);
     });
 
-    elements.nextButton.addEventListener("click", () => {
-        nextQuestion();
-    });
+    elements.nextButton.addEventListener("click", nextQuestion);
+    elements.restartButton.addEventListener("click", restartGame);
 
-    elements.restartButton.addEventListener("click", () => {
-        restartGame();
-    });
-
-    document.addEventListener("keydown", event => {
+    document.addEventListener("keydown", (event) => {
         if (event.key >= "1" && event.key <= "4") {
             const index = Number(event.key) - 1;
             if (!gameState.answered) {
@@ -676,9 +695,13 @@ function setupEvents() {
         }
     });
 
-    document.addEventListener("pointerdown", () => {
-        initAudio();
-    }, { once: true });
+    document.addEventListener(
+        "pointerdown",
+        () => {
+            initAudio();
+        },
+        { once: true }
+    );
 }
 
 // ============================================================
@@ -693,6 +716,7 @@ window.BoringWordGame = {
     getTemplateCount() { return gameState.templates.length; },
     generateQuestion,
     restart() { restartGame(); },
+    reloadProfile() { return loadUserProfile(); },
     enableSound() { APP_CONFIG.AUDIO_ENABLED = true; initAudio(); },
     disableSound() { APP_CONFIG.AUDIO_ENABLED = false; }
 };
@@ -702,7 +726,15 @@ window.BoringWordGame = {
 // ============================================================
 
 async function initGame() {
+    if (!isPlayPage) return;
+
     setupEvents();
+
+    // If already signed in, load profile immediately
+    if (getCurrentUser()) {
+        await loadUserProfile();
+    }
+
     try {
         await loadContent();
         if (gameState.vocabulary.length === 0 || gameState.templates.length === 0) {

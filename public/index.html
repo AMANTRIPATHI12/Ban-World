@@ -4,125 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BanWorld — Ban Weak Words. Build Powerful Vocabulary.</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/landing.css">
 </head>
 
 <body>
-    <main class="app">
+    <!-- WORD WAR LOADING SCREEN -->
+    <div id="loadingScreen" class="loading-screen">
+
+        <div class="battle-title">
+            <h1>BANWORLD</h1>
+            <p>Eliminating Weak Words...</p>
+        </div>
+
+        <div class="battle-arena">
+
+            <div class="fighter weak" id="weakWord">
+                VERY GOOD
+            </div>
+
+            <div class="vs-symbol">VS</div>
+
+            <div class="fighter strong" id="strongWord">
+                EXCEPTIONAL
+            </div>
+
+        </div>
+
+        <div class="battle-status" id="battleStatus">
+            Training vocabulary warriors...
+        </div>
+
+        <div class="progress-wrap">
+            <div class="progress-bar">
+                <div id="loadingProgress"></div>
+            </div>
+            <div id="loadingPercent">0%</div>
+        </div>
+
+    </div>
+    <main class="app landing">
 
         <!-- ============================= -->
         <!-- HEADER                         -->
         <!-- ============================= -->
         <header class="game-header">
             <div class="brand">
-                <span class="brand-main">BAN</span>
-                <span class="brand-accent">WORLD</span>
+                <a class="brand-main">BAN</a>
+                <a class="brand-accent">WORLD</a>
             </div>
+
             <div class="header-subtitle">
                 Ban Weak Words. Build Powerful Vocabulary.
+            </div>
+
+            <div class="header-actions">
+                <a href="rooms.html" class="rooms-nav-btn">Rooms</a>
+
+                <div class="auth-area" id="authArea">
+                    <button id="googleSignInBtn" class="google-btn">
+                        <span class="google-icon">G</span>
+                        <span>Sign in</span>
+                    </button>
+                    <div id="userInfo" class="user-info hidden">
+                        <img id="userPhoto" class="user-photo" alt="avatar" />
+                        <span id="userName" class="user-name"></span>
+                        <button id="signOutBtn" class="signout-btn">Sign out</button>
+                    </div>
+                </div>
             </div>
         </header>
 
         <!-- ============================= -->
-        <!-- GAME STATS                     -->
+        <!-- HERO                           -->
         <!-- ============================= -->
-        <section class="stats">
-            <div class="stat-card">
-                <span class="stat-label">SCORE</span>
-                <span id="score" class="stat-value">0</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">STREAK</span>
-                <span id="streak" class="stat-value">0</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">QUESTION</span>
-                <span id="questionNumber" class="stat-value">1</span>
-            </div>
-            <div class="stat-card timer-card">
-                <span class="stat-label">TIME</span>
-                <span id="timer" class="stat-value">15</span>
-            </div>
-        </section>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">Gen Z Vocabulary Challenge</div>
+                <h1 class="hero-title">
+                    Better Words.<br>
+                    <span class="hero-highlight">Bigger Opportunities.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Level up your vocabulary with fun, interactive quizzes.
+                    Build stronger communication skills and unlock your potential.
+                </p>
 
-        <!-- ============================= -->
-        <!-- PROGRESS BAR                   -->
-        <!-- ============================= -->
-        <div class="progress-container">
-            <div id="progressBar" class="progress-bar"></div>
-        </div>
-
-        <!-- ============================= -->
-        <!-- QUESTION                      -->
-        <!-- ============================= -->
-        <section class="question-section">
-            <div class="question-label">BAN THE BORING WORD</div>
-            <h1 id="questionText" class="question-text">Loading your challenge...</h1>
-            <p id="questionInstruction" class="question-instruction">
-                Replace the boring phrase with a stronger word.
-            </p>
-        </section>
-
-        <!-- ============================= -->
-        <!-- ANSWER OPTIONS                 -->
-        <!-- ============================= -->
-        <section id="options" class="options">
-            <button class="option" data-index="0">
-                <span class="option-letter">A</span>
-                <span class="option-text">Loading...</span>
-            </button>
-            <button class="option" data-index="1">
-                <span class="option-letter">B</span>
-                <span class="option-text">Loading...</span>
-            </button>
-            <button class="option" data-index="2">
-                <span class="option-letter">C</span>
-                <span class="option-text">Loading...</span>
-            </button>
-            <button class="option" data-index="3">
-                <span class="option-letter">D</span>
-                <span class="option-text">Loading...</span>
-            </button>
-        </section>
-
-        <!-- ============================= -->
-        <!-- FEEDBACK                      -->
-        <!-- ============================= -->
-        <section id="feedback" class="feedback hidden">
-            <div id="feedbackTitle" class="feedback-title"></div>
-            <div id="feedbackText" class="feedback-text"></div>
-            <button id="nextButton" class="next-button">NEXT WORD →</button>
-        </section>
-
-        <!-- ============================= -->
-        <!-- LOADING INDICATOR              -->
-        <!-- ============================= -->
-        <div id="loadingIndicator" class="loading-indicator hidden">
-            <span class="loading-dot"></span>
-            <span>Preparing more words...</span>
-        </div>
-
-        <!-- ============================= -->
-        <!-- GAME OVER                      -->
-        <!-- ============================= -->
-        <section id="gameOver" class="game-over hidden">
-            <div class="game-over-label">RUN COMPLETE</div>
-            <h2>You survived the boring-word apocalypse.</h2>
-            <div class="final-score">
-                <span>FINAL SCORE</span>
-                <strong id="finalScore">0</strong>
-            </div>
-            <div class="final-stats">
-                <div>
-                    <span>WORDS</span>
-                    <strong id="finalQuestions">0</strong>
-                </div>
-                <div>
-                    <span>BEST STREAK</span>
-                    <strong id="bestStreak">0</strong>
+                <div class="hero-actions">
+                    <a href="play.html" class="btn-primary">Start Playing →</a>
+                    <a href="rooms.html" class="btn-secondary">Join a Room</a>
                 </div>
             </div>
-            <button id="restartButton" class="restart-button">PLAY AGAIN</button>
+
+            <div class="hero-visual">
+                <div class="book-stack">
+                    <div class="book book-1">
+                        <span>BETTER</span>
+                        <span>WORDS</span>
+                    </div>
+                    <div class="book book-2">
+                        <span>BIGGER</span>
+                        <span>DREAMS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================= -->
+        <!-- FEATURES                       -->
+        <!-- ============================= -->
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Build Vocabulary</h3>
+                <p>Learn stronger words that stick through fast, addictive play.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Improve Communication</h3>
+                <p>Sound sharper in essays, interviews, and everyday conversations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Compete & Learn</h3>
+                <p>Join live rooms, race against friends, and climb the leaderboard.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Track Progress</h3>
+                <p>Sign in to save your score, streak, and best runs forever.</p>
+            </div>
         </section>
 
         <!-- ============================= -->
@@ -138,6 +149,8 @@
     <!-- JAVASCRIPT                     -->
     <!-- ============================= -->
     <script src="config.js"></script>
-    <script src="script.js"></script>
+    <script src="js/loading.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/auth.js"></script>
 </body>
 </html>

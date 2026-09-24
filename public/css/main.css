@@ -1,0 +1,437 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* ============================================================
+   RESET
+============================================================ */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #ffffff;
+    font-family: Inter, system-ui, sans-serif;
+    position: relative;
+    background:
+        radial-gradient(circle at 10% 10%, rgba(124, 93, 250, .15), transparent 25%),
+        radial-gradient(circle at 88% 18%, rgba(72, 232, 255, .1), transparent 24%),
+        radial-gradient(circle at 75% 85%, rgba(124, 93, 250, .1), transparent 30%),
+        #0b0e14;
+}
+
+/* ============================================================
+   VARIABLES
+============================================================ */
+:root {
+    --bg: #0b0e14;
+    --panel: #151823;
+    --panel2: #1c2030;
+    --text: #ffffff;
+    --muted: #9da1b5;
+
+    --pink: #7c5dfa;
+    --cyan: #48e8ff;
+    --lime: #2ecc71;
+    --yellow: #ffd75a;
+    --red: #ff5470;
+    --purple: #7c5dfa;
+}
+
+/* ============================================================
+   APP WRAPPER
+============================================================ */
+.app {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: linear-gradient(rgba(255,255,255,.01), rgba(255,255,255,.01));
+}
+
+.app::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+    z-index: 0;
+}
+
+/* ============================================================
+   UTILITY
+============================================================ */
+.hidden {
+    display: none !important;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.game-header {
+    width: 100%;
+    min-height: 105px;
+    padding: 28px clamp(24px, 5vw, 70px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    z-index: 3;
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    line-height: .9;
+    letter-spacing: -1.8px;
+    text-decoration: none;
+}
+
+.brand-main {
+    font-size: clamp(17px, 1.5vw, 25px);
+    color: #ffffff;
+}
+
+.brand-accent {
+    font-size: clamp(21px, 2.1vw, 34px);
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 25px rgba(124, 93, 250, .2);
+}
+
+.header-subtitle {
+    padding: 9px 16px;
+    border: 1px solid rgba(255,255,255,.13);
+    background: rgba(255,255,255,.045);
+    border-radius: 999px;
+    color: #dfe2f0;
+    font-size: clamp(10px, 1vw, 15px);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* NEW: right-side header stack */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   BUTTONS (shared)
+============================================================ */
+.rooms-nav-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: rgba(124,93,250,.15);
+    color: #fff;
+    border: 1px solid rgba(124,93,250,.4);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all .2s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.rooms-nav-btn:hover {
+    background: rgba(124,93,250,.28);
+}
+
+.primary-btn,
+.btn-primary {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    background: linear-gradient(90deg, var(--purple), #5a3df0);
+    color: #fff;
+    text-decoration: none;
+    transition: all .2s;
+}
+
+.primary-btn:hover,
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124,93,250,.35);
+}
+
+.secondary-btn,
+.btn-secondary {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.2);
+    text-decoration: none;
+    transition: all .2s;
+}
+
+.secondary-btn:hover,
+.btn-secondary:hover {
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.4);
+}
+
+.google-btn,
+.signout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: #151823;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+}
+
+.google-btn:hover,
+.signout-btn:hover {
+    background: #1c2030;
+    border-color: var(--purple);
+}
+
+.google-icon {
+    font-weight: 900;
+    color: #4285f4;
+}
+
+/* ============================================================
+   AUTH AREA (inside header)
+============================================================ */
+.auth-area {
+    display: flex;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    background: #151823;
+    border: 1px solid rgba(255,255,255,.15);
+}
+
+.user-photo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.user-name {
+    font-weight: 700;
+    font-size: 14px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.game-footer {
+    margin-top: auto;
+    padding: 25px;
+    text-align: center;
+    color: #777c92;
+    font-size: 12px;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================================
+   MOBILE (shared)
+============================================================ */
+@media (max-width: 850px) {
+    .game-header {
+        padding: 22px 20px;
+        min-height: 90px;
+    }
+
+    .header-subtitle {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        overflow-y: auto;
+    }
+
+    .app {
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+    .game-header {
+        padding: 20px 16px;
+        flex-wrap: wrap;
+    }
+
+    .brand-accent {
+        font-size: 24px;
+    }
+
+    .game-footer {
+        padding: 25px 15px;
+    }
+}
+
+/* ==========================================
+   WORD WAR LOADING SCREEN
+========================================== */
+
+.loading-screen{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+
+    background:
+    radial-gradient(circle at 20% 20%, rgba(255,84,112,.12), transparent 25%),
+    radial-gradient(circle at 80% 30%, rgba(72,232,255,.12), transparent 25%),
+    #090b12;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    overflow:hidden;
+}
+
+.battle-title{
+    text-align:center;
+    margin-bottom:60px;
+}
+
+.battle-title h1{
+    margin:0;
+    font-size:70px;
+    font-family:"Space Grotesk";
+    letter-spacing:-3px;
+}
+
+.battle-title p{
+    color:#9da1b5;
+    margin-top:10px;
+}
+
+.battle-arena{
+    display:flex;
+    align-items:center;
+    gap:40px;
+}
+
+.fighter{
+    font-family:"Space Grotesk";
+    font-size:48px;
+    font-weight:900;
+    transition:.5s;
+}
+
+.weak{
+    color:#ff5470;
+    animation:weakShake .7s infinite;
+}
+
+.strong{
+    color:#48e8ff;
+    text-shadow:0 0 20px rgba(72,232,255,.5);
+}
+
+.vs-symbol{
+    font-size:26px;
+    opacity:.5;
+}
+
+.battle-status{
+    margin-top:50px;
+    color:#dfe2f0;
+    font-weight:700;
+}
+
+.progress-wrap{
+    width:420px;
+    margin-top:30px;
+}
+
+.progress-bar{
+    width:100%;
+    height:10px;
+    border-radius:999px;
+    background:#1c2030;
+    overflow:hidden;
+}
+
+#loadingProgress{
+    width:0%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        #ff5470,
+        #48e8ff
+    );
+    transition:.3s;
+}
+
+#loadingPercent{
+    text-align:center;
+    margin-top:10px;
+    font-weight:800;
+}
+
+@keyframes weakShake{
+    0%{transform:translateX(0);}
+    25%{transform:translateX(-3px);}
+    50%{transform:translateX(3px);}
+    75%{transform:translateX(-2px);}
+    100%{transform:translateX(0);}
+}
+
+.word-defeated{
+    opacity:0;
+    transform:scale(.2) rotate(15deg);
+}
+
+.loading-hide{
+    opacity:0;
+    pointer-events:none;
+    transition:.8s;
+}

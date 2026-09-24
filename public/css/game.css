@@ -1,131 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
-
 /* ============================================================
-   RESET
+   GAME PAGE
 ============================================================ */
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    margin: 0;
-    width: 100%;
-    min-height: 100%;
-}
-
-body {
-    min-height: 100vh;
-    overflow-x: hidden;
-    background: #0b0e14; /* Dark navy from WordUp */
-    color: #ffffff;
-    font-family: Inter, system-ui, sans-serif;
-}
-
-/* ============================================================
-   VARIABLES (Updated Color Theme)
-============================================================ */
-:root {
-    --bg: #0b0e14;
-    --panel: #151823;
-    --panel2: #1c2030;
-    --text: #ffffff;
-    --muted: #9da1b5;
-    
-    /* New WordUp-inspired palette */
-    --pink: #7c5dfa;    /* Primary Purple */
-    --cyan: #48e8ff;    /* Bright Blue */
-    --lime: #2ecc71;    /* Success Green */
-    --yellow: #ffd75a;  /* Warning Yellow */
-    --red: #ff5470;     /* Error Red */
-    --purple: #7c5dfa;  /* Main Accent */
-}
-
-/* ============================================================
-   BACKGROUND
-============================================================ */
-body {
-    position: relative;
-    background:
-        radial-gradient(circle at 10% 10%, rgba(124, 93, 250, .15), transparent 25%),
-        radial-gradient(circle at 88% 18%, rgba(72, 232, 255, .1), transparent 24%),
-        radial-gradient(circle at 75% 85%, rgba(124, 93, 250, .1), transparent 30%),
-        #0b0e14;
-}
-
-/* ============================================================
-   APP
-============================================================ */
-.app {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: linear-gradient(rgba(255,255,255,.01), rgba(255,255,255,.01));
-}
-
-/* subtle grid */
-.app::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-    background-size: 40px 40px;
-    mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
-    z-index: 0;
-}
-
-/* ============================================================
-   HEADER
-============================================================ */
-.game-header {
-    width: 100%;
-    min-height: 105px;
-    padding: 28px clamp(24px, 5vw, 70px);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    position: relative;
-    z-index: 3;
-}
-
-.brand {
-    display: flex;
-    flex-direction: column;
-    font-family: "Space Grotesk", sans-serif;
-    font-weight: 900;
-    line-height: .9;
-    letter-spacing: -1.8px;
-}
-
-.brand-main {
-    font-size: clamp(17px, 1.5vw, 25px);
-    color: #ffffff;
-}
-
-.brand-accent {
-    font-size: clamp(21px, 2.1vw, 34px);
-    background: linear-gradient(90deg, var(--cyan), var(--purple));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 25px rgba(124, 93, 250, .2);
-}
-
-.header-subtitle {
-    padding: 9px 16px;
-    border: 1px solid rgba(255,255,255,.13);
-    background: rgba(255,255,255,.045);
-    border-radius: 999px;
-    color: #dfe2f0;
-    font-size: clamp(10px, 1vw, 15px);
-    font-weight: 800;
-    white-space: nowrap;
-}
 
 /* ============================================================
    STATS
@@ -174,7 +49,31 @@ body {
 .timer-card .stat-value { color: var(--yellow); }
 
 /* ============================================================
-   PROGRESS
+   SIGN-IN HINT (NEW)
+============================================================ */
+.sign-in-hint {
+    width: min(1100px, calc(100% - 40px));
+    margin: 14px auto 0;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(72, 232, 255, .06);
+    border: 1px solid rgba(72, 232, 255, .18);
+    border-radius: 12px;
+    color: var(--cyan);
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+}
+
+.hint-icon {
+    font-size: 15px;
+}
+
+/* ============================================================
+   PROGRESS BAR
 ============================================================ */
 .progress-container {
     width: min(1100px, calc(100% - 40px));
@@ -197,7 +96,7 @@ body {
 }
 
 /* ============================================================
-   QUESTION AREA
+   QUESTION
 ============================================================ */
 .question-section {
     width: min(1100px, calc(100% - 40px));
@@ -420,20 +319,6 @@ body {
 }
 
 /* ============================================================
-   FOOTER
-============================================================ */
-.game-footer {
-    margin-top: auto;
-    padding: 25px;
-    text-align: center;
-    color: #777c92;
-    font-size: 12px;
-    font-weight: 700;
-    position: relative;
-    z-index: 2;
-}
-
-/* ============================================================
    GAME OVER
 ============================================================ */
 .game-over {
@@ -533,39 +418,80 @@ body {
 }
 
 /* ============================================================
-   HIDDEN
-============================================================ */
-.hidden {
-    display: none !important;
-}
-
-/* ============================================================
-   MOBILE
+   RESPONSIVE
 ============================================================ */
 @media (max-width: 850px) {
-    .game-header { padding: 22px 20px; min-height: 90px; }
-    .header-subtitle { display: none; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .options { grid-template-columns: repeat(2, 1fr); }
-    .question-section { margin-top: 4vh; }
-    .question-text { letter-spacing: -1px; }
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .question-section {
+        margin-top: 4vh;
+    }
+
+    .question-text {
+        letter-spacing: -1px;
+    }
 }
 
 @media (max-width: 600px) {
-    body { overflow-y: auto; }
-    .app { min-height: 100vh; overflow: visible; }
-    .game-header { padding: 20px 16px; }
-    .brand-accent { font-size: 24px; }
-    .stats { width: calc(100% - 24px); gap: 8px; }
-    .stat-card { min-height: 65px; padding: 10px 13px; }
-    .stat-value { font-size: 19px; }
-    .progress-container { width: calc(100% - 24px); }
-    .question-section { width: calc(100% - 24px); margin-top: 35px; }
-    .question-text { font-size: clamp(25px, 8vw, 38px); }
-    .question-instruction { font-size: 13px; }
-    .options { width: calc(100% - 24px); grid-template-columns: 1fr; gap: 10px; margin-top: 25px; }
-    .option { min-height: 68px; }
-    .feedback { width: calc(100% - 24px); }
-    .game-footer { padding: 25px 15px; }
-    .final-stats { grid-template-columns: 1fr; }
+    .stats {
+        width: calc(100% - 24px);
+        gap: 8px;
+    }
+
+    .stat-card {
+        min-height: 65px;
+        padding: 10px 13px;
+    }
+
+    .stat-value {
+        font-size: 19px;
+    }
+
+    .sign-in-hint {
+        width: calc(100% - 24px);
+        font-size: 12px;
+        padding: 9px 12px;
+    }
+
+    .progress-container {
+        width: calc(100% - 24px);
+    }
+
+    .question-section {
+        width: calc(100% - 24px);
+        margin-top: 35px;
+    }
+
+    .question-text {
+        font-size: clamp(25px, 8vw, 38px);
+    }
+
+    .question-instruction {
+        font-size: 13px;
+    }
+
+    .options {
+        width: calc(100% - 24px);
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    .option {
+        min-height: 68px;
+    }
+
+    .feedback {
+        width: calc(100% - 24px);
+    }
+
+    .final-stats {
+        grid-template-columns: 1fr;
+    }
 }
