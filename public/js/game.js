@@ -12,14 +12,58 @@ import {
 import { authFetch, onAuthChange, getCurrentUser } from "./auth.js";
 
 // ============================================================
+// PROFILE CACHE (localStorage) — instant render on reload
+// ============================================================
+
+const PROFILE_CACHE_KEY = "bw_profile_v1";
+
+function readProfileCache() {
+    try {
+        const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return null;
+        return parsed;
+    } catch {
+        return null;
+    }
+}
+
+function writeProfileCache(profile) {
+    try {
+        localStorage.setItem(
+            PROFILE_CACHE_KEY,
+            JSON.stringify({ ...profile, _cachedAt: Date.now() })
+        );
+    } catch {
+        // quota / private mode — ignore
+    }
+}
+
+function clearProfileCache() {
+    try {
+        localStorage.removeItem(PROFILE_CACHE_KEY);
+    } catch {
+        // ignore
+    }
+}
+
+// ============================================================
 // GAME STATE
 // ============================================================
 
 const gameState = {
-    score: 0,
-    streak: 0,
-    bestStreak: 0,
+    // Persisted (from DB + cache)
+    score: 0,              // total cumulative score
+    dailyStreak: 0,        // consecutive days with ≥5 questions
+    bestStreak: 0,         // all-time best daily streak
+    todayAnswered: 0,      // questions answered today
+    lastPlayedDate: null,  // YYYY-MM-DD
+
+    // Session-only
+    sessionStreak: 0,      // correct-answer streak for score bonuses
     questionNumber: 1,
+
     vocabulary: [],
     templates: [],
     currentQuestion: null,
@@ -33,7 +77,6 @@ const gameState = {
     generationCounter: 0
 };
 
-// Guard: this script only runs on play.html
 const isPlayPage = !!document.getElementById("options");
 if (!isPlayPage) {
     console.warn("[game] play.html elements not found — skipping init.");
@@ -46,6 +89,7 @@ if (!isPlayPage) {
 const elements = {
     score: document.getElementById("score"),
     streak: document.getElementById("streak"),
+    bestStreakMini: document.getElementById("bestStreakMini"),
     questionNumber: document.getElementById("questionNumber"),
     timer: document.getElementById("timer"),
     progressBar: document.getElementById("progressBar"),
@@ -61,7 +105,8 @@ const elements = {
     finalScore: document.getElementById("finalScore"),
     finalQuestions: document.getElementById("finalQuestions"),
     bestStreak: document.getElementById("bestStreak"),
-    restartButton: document.getElementById("restartButton")
+    restartButton: document.getElementById("restartButton"),
+    authArea: document.getElementById("authArea")
 };
 
 // ============================================================
@@ -72,7 +117,6 @@ let audioContext = null;
 
 function initAudio() {
     if (!APP_CONFIG.AUDIO_ENABLED) return;
-
     if (!audioContext) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) {
@@ -81,7 +125,6 @@ function initAudio() {
         }
         audioContext = new AudioContext();
     }
-
     if (audioContext.state === "suspended") {
         audioContext.resume().catch(() => {});
     }
@@ -89,22 +132,17 @@ function initAudio() {
 
 function playTone(frequency, duration = 0.1, type = "sine", volume = 0.05, delay = 0) {
     if (!APP_CONFIG.AUDIO_ENABLED || !audioContext) return;
-
     const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
-
     oscillator.type = type;
     oscillator.frequency.value = frequency;
     oscillator.connect(gain);
     gain.connect(audioContext.destination);
-
     const startTime = audioContext.currentTime + delay;
     const endTime = startTime + duration;
-
     gain.gain.setValueAtTime(0.0001, startTime);
     gain.gain.exponentialRampToValueAtTime(volume, startTime + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
-
     oscillator.start(startTime);
     oscillator.stop(endTime);
 }
@@ -158,74 +196,107 @@ function questionIdFromContent(vocabulary, template, subject, context, variation
 }
 
 // ============================================================
-// USER PROFILE SYNC
+// PROFILE SYNC — CACHE FIRST, THEN DB
 // ============================================================
 
-let profileLoaded = false;
+/**
+ * Applies a profile object to local state + UI.
+ */
+function applyProfile(profile) {
+    if (!profile) return;
+
+    gameState.score = Number(profile.totalScore) || 0;
+    gameState.dailyStreak = Number(profile.currentStreak) || 0;
+    gameState.bestStreak = Number(profile.bestStreak) || 0;
+    gameState.todayAnswered = Number(profile.todayQuestionsAnswered) || 0;
+    gameState.lastPlayedDate = profile.lastPlayedDate || null;
+
+    updateStats();
+}
 
 /**
- * Fetch the signed-in user's profile from backend and pre-fill score/bestStreak.
- * Called on page load and whenever the user signs in.
+ * Render from cache immediately so there's zero flash.
+ * Returns true if a cache was found.
  */
-async function loadUserProfile() {
-    if (!getCurrentUser()) {
-        // Not signed in → reset local stats
-        gameState.score = 0;
-        gameState.bestStreak = 0;
-        updateStats();
-        return;
-    }
+function renderFromCache() {
+    const cached = readProfileCache();
+    if (!cached) return false;
+    applyProfile(cached);
+    return true;
+}
+
+/**
+ * Fetch from backend, update cache, then re-render.
+ */
+async function fetchAndApplyProfile() {
+    if (!getCurrentUser()) return;
 
     try {
         const res = await authFetch("/api/user/profile");
         const data = await res.json();
-
         if (!data.success || !data.profile) {
-            console.warn("[game] Could not load profile:", data.message);
+            console.warn("[game] Profile fetch returned no data:", data.message);
             return;
         }
-
-        gameState.score = data.profile.totalScore || 0;
-        gameState.bestStreak = data.profile.bestStreak || 0;
-        profileLoaded = true;
-
-        updateStats();
-        console.log(
-            `[game] Loaded profile — totalScore: ${gameState.score}, bestStreak: ${gameState.bestStreak}`
-        );
+        applyProfile(data.profile);
+        writeProfileCache(data.profile);
     } catch (err) {
-        console.warn("[game] Profile fetch failed:", err);
+        console.warn("[game] Profile fetch failed (using cache):", err);
     }
 }
 
 /**
- * Save a score delta to the backend. Fire-and-forget — no await,
- * so the game doesn't lag while the network call happens.
+ * Sends a score delta to the backend.
+ * The server returns the updated profile, which we use to
+ * refresh the local state + cache.
  */
 async function saveScoreDelta(delta) {
     if (!getCurrentUser() || delta <= 0) return;
 
     try {
-        await authFetch("/api/user/score", {
+        const res = await authFetch("/api/user/score", {
             method: "POST",
-            body: JSON.stringify({
-                deltaScore: delta,
-                bestStreak: gameState.bestStreak
-            })
+            body: JSON.stringify({ deltaScore: delta })
         });
+        const data = await res.json();
+        if (!data.success || !data.profile) return;
+
+        applyProfile(data.profile);
+        writeProfileCache(data.profile);
+
+        console.log(
+            `[game] Profile updated — total: ${data.profile.totalScore}, dailyStreak: ${data.profile.currentStreak}, best: ${data.profile.bestStreak}`
+        );
     } catch (err) {
         console.warn("[game] Score save failed:", err);
     }
 }
 
-// Subscribe to auth state — load profile on sign-in, reset on sign-out
+// Reset everything when the user signs out
+function resetProfileState() {
+    gameState.score = 0;
+    gameState.dailyStreak = 0;
+    gameState.bestStreak = 0;
+    gameState.todayAnswered = 0;
+    gameState.lastPlayedDate = null;
+    clearProfileCache();
+    updateStats();
+}
+
+// ============================================================
+// AUTH STATE
+// ============================================================
+
 onAuthChange(async (user) => {
+    // Reveal the auth area (fixes the "Sign in" flash on page load)
+    if (elements.authArea) {
+        elements.authArea.classList.remove("hidden");
+    }
+
     if (user) {
-        await loadUserProfile();
+        await fetchAndApplyProfile();
     } else {
-        gameState.score = 0;
-        gameState.bestStreak = 0;
-        updateStats();
+        resetProfileState();
     }
 });
 
@@ -238,9 +309,7 @@ async function loadContent() {
     try {
         console.log("Loading content from server...");
         const response = await fetch(APP_CONFIG.API_CONTENT_URL, { cache: "no-store" });
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Server returned ${response.status}`);
         const data = await response.json();
         if (!Array.isArray(data.vocabulary) || !Array.isArray(data.templates)) {
             throw new Error("Invalid content received from server.");
@@ -490,12 +559,11 @@ function handleAnswer(index) {
 }
 
 function handleCorrectAnswer() {
-    gameState.streak++;
-    gameState.bestStreak = Math.max(gameState.bestStreak, gameState.streak);
+    gameState.sessionStreak++;
 
     const baseScore = 100;
     const timeBonus = gameState.timer * 10;
-    const streakBonus = Math.min(gameState.streak * 10, 100);
+    const streakBonus = Math.min(gameState.sessionStreak * 10, 100);
     const earned = baseScore + timeBonus + streakBonus;
 
     gameState.score += earned;
@@ -508,12 +576,12 @@ function handleCorrectAnswer() {
     );
     updateStats();
 
-    // Save delta to backend (fire-and-forget)
+    // Fire-and-forget: server increments today's count, recalculates daily streak
     saveScoreDelta(earned);
 }
 
 function handleWrongAnswer() {
-    gameState.streak = 0;
+    gameState.sessionStreak = 0;
     playWrongSound();
     showFeedback(
         false,
@@ -521,6 +589,9 @@ function handleWrongAnswer() {
         gameState.currentQuestion.tip
     );
     updateStats();
+
+    // Wrong answers still count toward "played today"
+    saveScoreDelta(0);
 }
 
 // ============================================================
@@ -569,7 +640,7 @@ function handleTimeout() {
     if (gameState.answered) return;
     gameState.answered = true;
     stopTimer();
-    gameState.streak = 0;
+    gameState.sessionStreak = 0;
     playTimeoutSound();
 
     const buttons = elements.options.querySelectorAll(".option");
@@ -587,6 +658,9 @@ function handleTimeout() {
         gameState.currentQuestion.tip
     );
     updateStats();
+
+    // Still counts as played today
+    saveScoreDelta(0);
 }
 
 // ============================================================
@@ -622,15 +696,14 @@ function endGame() {
 // ============================================================
 // RESTART
 // ============================================================
-// Note: score & bestStreak are all-time cumulative (persisted).
-// Restart only resets the current session's streak counter.
+// Keeps persisted score & daily streak. Only resets the session
+// streak and question counter.
 // ============================================================
 
 function restartGame() {
     stopTimer();
 
-    // Keep score & bestStreak — they're persisted to backend
-    gameState.streak = 0;
+    gameState.sessionStreak = 0;
     gameState.questionNumber = 1;
     gameState.currentQuestion = null;
     gameState.timer = APP_CONFIG.QUESTION_TIME;
@@ -652,7 +725,12 @@ function restartGame() {
 
 function updateStats() {
     elements.score.textContent = gameState.score;
-    elements.streak.textContent = gameState.streak;
+    elements.streak.textContent = gameState.dailyStreak;
+
+    if (elements.bestStreakMini) {
+        elements.bestStreakMini.textContent = `Best: ${gameState.bestStreak}`;
+    }
+
     elements.questionNumber.textContent = gameState.questionNumber;
 }
 
@@ -716,7 +794,7 @@ window.BoringWordGame = {
     getTemplateCount() { return gameState.templates.length; },
     generateQuestion,
     restart() { restartGame(); },
-    reloadProfile() { return loadUserProfile(); },
+    reloadProfile() { return fetchAndApplyProfile(); },
     enableSound() { APP_CONFIG.AUDIO_ENABLED = true; initAudio(); },
     disableSound() { APP_CONFIG.AUDIO_ENABLED = false; }
 };
@@ -730,9 +808,12 @@ async function initGame() {
 
     setupEvents();
 
-    // If already signed in, load profile immediately
+    // 1) Render cached profile instantly (kills the flash)
+    renderFromCache();
+
+    // 2) Fetch fresh data in the background (if signed in)
     if (getCurrentUser()) {
-        await loadUserProfile();
+        fetchAndApplyProfile();
     }
 
     try {

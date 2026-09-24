@@ -1,7 +1,6 @@
 // ============================================================
 // ROOMS — Create / Join / Play / Host
 // ============================================================
-
 import { escapeHTML } from "./main.js";
 import {
     authFetch,
@@ -15,15 +14,14 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/fire
 // ============================================================
 // CONSTANTS
 // ============================================================
-
 const MAX_QUESTIONS_PER_ROOM = 20;
 const MIN_QUESTIONS_PER_ROOM = 5;
 const GENERATE_BATCH_SIZE = 6;
+const ROOM_STORAGE_KEY = "bw_active_room_v1";
 
 // ============================================================
 // DOM
 // ============================================================
-
 const el = {
     // auth
     signedOut: document.getElementById("roomsSignedOut"),
@@ -49,7 +47,6 @@ const el = {
     generateBtn: document.getElementById("generateQsBtn"),
     addQBtn: document.getElementById("addCustomQBtn"),
     builderHint: document.getElementById("builderHint"),
-
     confirmCreate: document.getElementById("confirmCreateBtn"),
     cancelCreate: document.getElementById("cancelCreateBtn"),
 
@@ -98,11 +95,9 @@ const el = {
 // ============================================================
 // STATE
 // ============================================================
-
 let currentUser = null;
 let currentRoomId = null;
 let roomUnsubscribe = null;
-
 let currentRoom = null;
 let myRole = "player"; // 'player' | 'host'
 let questionTimerInterval = null;
@@ -124,10 +119,42 @@ const rendered = {
 };
 
 // ============================================================
+// LOCAL STORAGE HELPERS (so room survives refresh / navigation)
+// ============================================================
+function saveActiveRoom(roomId, role) {
+    try {
+        localStorage.setItem(ROOM_STORAGE_KEY, JSON.stringify({ roomId, role, ts: Date.now() }));
+    } catch (_) {}
+}
+
+function loadActiveRoom() {
+    try {
+        const raw = localStorage.getItem(ROOM_STORAGE_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        // Ignore very old entries (safety)
+        if (Date.now() - (data.ts || 0) > 25 * 60 * 60 * 1000) {
+            clearActiveRoom();
+            return null;
+        }
+        return data;
+    } catch (_) {
+        return null;
+    }
+}
+
+function clearActiveRoom() {
+    try {
+        localStorage.removeItem(ROOM_STORAGE_KEY);
+    } catch (_) {}
+}
+
+// ============================================================
 // AUTH
 // ============================================================
+let mineRoomsChecked = false;
 
-onAuthChange((user) => {
+onAuthChange(async (user) => {
     currentUser = user;
 
     if (!el.signedOut) return;
@@ -135,6 +162,12 @@ onAuthChange((user) => {
     if (user) {
         el.signedOut.classList.add("hidden");
         el.controls.classList.remove("hidden");
+
+        // Auto-rejoin the user's active room (only once per page load)
+        if (!mineRoomsChecked && !currentRoomId) {
+            mineRoomsChecked = true;
+            await checkAndRejoinMyRoom();
+        }
     } else {
         el.signedOut.classList.remove("hidden");
         el.controls.classList.add("hidden");
@@ -143,17 +176,52 @@ onAuthChange((user) => {
         el.gamePanel.classList.add("hidden");
         el.finishedPanel.classList.add("hidden");
         teardownRoom();
+        mineRoomsChecked = false;
     }
 });
 
-if (el.signInBtn) {
-    el.signInBtn.addEventListener("click", () => signInWithGoogle());
+async function checkAndRejoinMyRoom() {
+    try {
+        // 1) Prefer server truth
+        const res = await authFetch("/api/rooms/mine");
+        const data = await res.json();
+
+        if (data.success && data.roomId) {
+            console.log("[rooms] Auto-rejoining room:", data.roomId, "as", data.role);
+            currentRoomId = data.roomId;
+            myRole = data.role || "player";
+            saveActiveRoom(data.roomId, myRole);
+            subscribeToRoom(data.roomId);
+            return;
+        }
+
+        // 2) Fallback to localStorage (in case of temporary network glitch)
+        const stored = loadActiveRoom();
+        if (stored?.roomId) {
+            console.log("[rooms] Trying stored room:", stored.roomId);
+            currentRoomId = stored.roomId;
+            myRole = stored.role || "player";
+            subscribeToRoom(stored.roomId);
+            return;
+        }
+
+        // No active room
+        clearActiveRoom();
+    } catch (err) {
+        console.warn("[rooms] Failed to check active rooms:", err);
+        // Still try localStorage as last resort
+        const stored = loadActiveRoom();
+        if (stored?.roomId && !currentRoomId) {
+            currentRoomId = stored.roomId;
+            myRole = stored.role || "player";
+            subscribeToRoom(stored.roomId);
+        }
+    }
 }
 
 // ============================================================
 // HELPERS
 // ============================================================
-
 function showError(msg) {
     if (!el.error) return;
     el.error.textContent = msg;
@@ -182,7 +250,6 @@ function teardownRoom() {
     stopQuestionTimer();
     currentRoomId = null;
     currentRoom = null;
-
     // Reset diff cache
     rendered.qIdx = -1;
     rendered.scoreSig = "";
@@ -195,7 +262,6 @@ function teardownRoom() {
 // ============================================================
 // CREATE — host mode toggle
 // ============================================================
-
 if (el.modePlayerBtn) {
     el.modePlayerBtn.addEventListener("click", () => {
         createHostMode = "player";
@@ -219,7 +285,6 @@ if (el.modeHostBtn) {
 // ============================================================
 // CREATE — open / cancel
 // ============================================================
-
 if (el.createBtn) {
     el.createBtn.addEventListener("click", () => {
         showPanel("createForm");
@@ -240,14 +305,12 @@ if (el.cancelCreate) {
 // ============================================================
 // QUESTION BUILDER — counter & buttons
 // ============================================================
-
 function updateCounter() {
     const text = `${builderQuestions.length} / ${MAX_QUESTIONS_PER_ROOM}`;
     if (el.questionCounter && rendered.questionCounterText !== text) {
         el.questionCounter.textContent = text;
         rendered.questionCounterText = text;
     }
-
     // Color the counter when in valid range
     if (el.questionCounter) {
         const valid = builderQuestions.length >= MIN_QUESTIONS_PER_ROOM;
@@ -283,14 +346,9 @@ function updateBuilderButtons() {
 // ============================================================
 // QUESTION BUILDER — render list (with delegation)
 // ============================================================
-
 function renderQuestionList(forceRebuild = false) {
     if (!el.questionList) return;
 
-    // Signature: length + last edit timestamp isn't reliable, so
-    // rebuild whenever we're not in a forceRebuild-only scenario.
-    // Simpler: always rebuild the list DOM. This is fine — the list
-    // only re-renders during creation, not during gameplay.
     el.questionList.innerHTML = builderQuestions
         .map((q, i) => {
             const optionsHtml = q.options
@@ -352,7 +410,6 @@ function renderQuestionList(forceRebuild = false) {
 // ============================================================
 // QUESTION BUILDER — input delegation
 // ============================================================
-
 if (el.questionList) {
     // Text inputs
     el.questionList.addEventListener("input", (e) => {
@@ -396,7 +453,6 @@ if (el.questionList) {
 // ============================================================
 // QUESTION BUILDER — add / generate
 // ============================================================
-
 if (el.addQBtn) {
     el.addQBtn.addEventListener("click", () => {
         if (builderQuestions.length >= MAX_QUESTIONS_PER_ROOM) return;
@@ -418,7 +474,6 @@ if (el.generateBtn) {
         if (remaining <= 0) return;
 
         const requestCount = Math.min(GENERATE_BATCH_SIZE, remaining);
-
         el.generateBtn.disabled = true;
         el.generateBtn.textContent = "Generating...";
 
@@ -434,7 +489,6 @@ if (el.generateBtn) {
             const incoming = Array.isArray(data.questions) ? data.questions : [];
             const allowed = incoming.slice(0, MAX_QUESTIONS_PER_ROOM - builderQuestions.length);
             builderQuestions.push(...allowed);
-
             renderQuestionList();
             updateCounter();
         } catch (err) {
@@ -448,7 +502,6 @@ if (el.generateBtn) {
 // ============================================================
 // CONFIRM CREATE
 // ============================================================
-
 if (el.confirmCreate) {
     el.confirmCreate.addEventListener("click", async () => {
         if (builderQuestions.length < MIN_QUESTIONS_PER_ROOM) {
@@ -489,14 +542,31 @@ if (el.confirmCreate) {
                     hostMode: createHostMode
                 })
             });
-
             const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+
+            if (!data.success) {
+                // Special case: user already has an active room
+                if (data.existingRoomId) {
+                    const jump = confirm(
+                        `${data.message}\n\nJump into your existing room (${data.existingCode})?`
+                    );
+                    if (jump) {
+                        el.confirmCreate.disabled = false;
+                        el.confirmCreate.textContent = "Create Room";
+                        currentRoomId = data.existingRoomId;
+                        myRole = "player"; // will be corrected by snapshot
+                        saveActiveRoom(data.existingRoomId, myRole);
+                        subscribeToRoom(data.existingRoomId);
+                        return;
+                    }
+                }
+                throw new Error(data.message);
+            }
 
             currentRoomId = data.roomId;
             myRole = createHostMode === "host" ? "host" : "player";
+            saveActiveRoom(data.roomId, myRole);
             el.waitingCode.textContent = data.code;
-
             subscribeToRoom(data.roomId);
             showPanel("waiting");
         } catch (err) {
@@ -511,16 +581,13 @@ if (el.confirmCreate) {
 // ============================================================
 // JOIN ROOM
 // ============================================================
-
 if (el.joinBtn) {
     el.joinBtn.addEventListener("click", async () => {
         const code = el.codeInput.value.trim().toUpperCase();
-
         if (code.length !== 6) {
             showError("Enter a 6-character code.");
             return;
         }
-
         clearError();
         el.joinBtn.disabled = true;
 
@@ -533,8 +600,8 @@ if (el.joinBtn) {
             if (!data.success) throw new Error(data.message);
 
             currentRoomId = data.roomId;
-            myRole = data.role || "player"; // joiners always get "player"
-
+            myRole = data.role || "player";
+            saveActiveRoom(data.roomId, myRole);
             subscribeToRoom(data.roomId);
         } catch (err) {
             showError(err.message);
@@ -547,13 +614,13 @@ if (el.joinBtn) {
 // ============================================================
 // SUBSCRIBE TO ROOM
 // ============================================================
-
 function subscribeToRoom(roomId) {
     if (roomUnsubscribe) roomUnsubscribe();
 
     roomUnsubscribe = onSnapshot(doc(fsDb, "rooms", roomId), (snap) => {
         if (!snap.exists()) {
             alert("Room expired or deleted.");
+            clearActiveRoom();
             backToLobby();
             return;
         }
@@ -571,6 +638,9 @@ function subscribeToRoom(roomId) {
             myRole = "player";
         }
 
+        // Keep localStorage in sync
+        saveActiveRoom(roomId, myRole);
+
         if (data.status === "waiting") {
             renderWaitingRoom(data, isCreator);
             showPanel("waiting");
@@ -580,14 +650,20 @@ function subscribeToRoom(roomId) {
         } else if (data.status === "finished") {
             renderFinished(data);
             showPanel("finished");
+            // Room finished → clear stored room so we don't auto-rejoin later
+            clearActiveRoom();
         }
+    }, (err) => {
+        console.error("[rooms] Snapshot error:", err);
+        // If permission / not found, clear and go back
+        clearActiveRoom();
+        backToLobby();
     });
 }
 
 // ============================================================
 // WAITING ROOM
 // ============================================================
-
 function renderWaitingRoom(room, isCreator) {
     el.waitingCode.textContent = room.code || "";
     el.waitingName.textContent = room.name || "Vocabulary Room";
@@ -635,7 +711,6 @@ function renderWaitingRoom(room, isCreator) {
 // ============================================================
 // LOBBY ROLE TOGGLE (creator only)
 // ============================================================
-
 async function changeHostMode(newMode) {
     if (!currentRoomId) return;
     try {
@@ -667,7 +742,6 @@ if (el.lobbyModeHostBtn) {
 // ============================================================
 // START GAME
 // ============================================================
-
 if (el.startGameBtn) {
     el.startGameBtn.addEventListener("click", async () => {
         if (!currentRoomId) return;
@@ -692,12 +766,6 @@ if (el.startGameBtn) {
 // ============================================================
 // GAME VIEW — DIFF-BASED RENDER
 // ============================================================
-//
-// Firestore fires on every score update. Instead of rebuilding the
-// whole view every tick, we compare values and only touch the DOM
-// when something actually changed. This makes the room feel smooth.
-// ============================================================
-
 function renderGame(room, isCreator) {
     const qIdx = room.currentQuestionIndex || 0;
     const total = (room.questions || []).length;
@@ -713,6 +781,7 @@ function renderGame(room, isCreator) {
         ? "👀 You are the host — students are playing"
         : "🎮 You are a player";
     const bannerClass = isSpectator ? "room-role-banner host" : "room-role-banner player";
+
     if (rendered.roleBannerText !== bannerText) {
         el.roleBanner.textContent = bannerText;
         el.roleBanner.className = bannerClass;
@@ -721,17 +790,35 @@ function renderGame(room, isCreator) {
 
     // ---- STATS (only when values change) ----
     const newScore = me ? String(me.score || 0) : "—";
-    const newStreak = me ? String(me.streak || 0) : "—";
     const newQNum = String(qIdx + 1);
 
-    if (el.score.textContent !== newScore) el.score.textContent = newScore;
-    if (el.streak.textContent !== newStreak) el.streak.textContent = newStreak;
-    if (el.questionNumber.textContent !== newQNum) el.questionNumber.textContent = newQNum;
+    if (el.score && el.score.textContent !== newScore) el.score.textContent = newScore;
+
+    // Use cached profile for daily streak display (no gameState dependency)
+    let dailyStreak = 0;
+    let bestStreak = 0;
+    try {
+        const cachedProfile = JSON.parse(localStorage.getItem("bw_profile_v1") || "null");
+        if (cachedProfile) {
+            dailyStreak = Number(cachedProfile.currentStreak) || 0;
+            bestStreak = Number(cachedProfile.bestStreak) || 0;
+        }
+    } catch (_) {}
+
+    if (el.streak && el.streak.textContent !== String(dailyStreak)) {
+        el.streak.textContent = dailyStreak;
+    }
+    const miniEl = document.getElementById("bestStreakMini");
+    if (miniEl) miniEl.textContent = `Best: ${bestStreak}`;
+
+    if (el.questionNumber && el.questionNumber.textContent !== newQNum) {
+        el.questionNumber.textContent = newQNum;
+    }
 
     // ---- PROGRESS (only when qIdx changes) ----
     const progressPct = ((qIdx + 1) / total) * 100;
     const newWidth = `${progressPct}%`;
-    if (el.progressBar.style.width !== newWidth) {
+    if (el.progressBar && el.progressBar.style.width !== newWidth) {
         el.progressBar.style.width = newWidth;
     }
 
@@ -819,11 +906,6 @@ function renderOptions(options, isSpectator) {
 // ============================================================
 // SUBMIT ANSWER — OPTIMISTIC UI
 // ============================================================
-//
-// We mark the button immediately (feels instant), then confirm
-// with the server. If the server rejects, we revert.
-// ============================================================
-
 async function submitAnswer(selectedIndex) {
     if (!currentRoom || !currentUser) return;
     if (currentRoom.hostMode === "host" && !currentRoom.players?.[currentUser.uid]) return;
@@ -898,7 +980,6 @@ function hideFeedback() {
 // ============================================================
 // HOST CONTROLS
 // ============================================================
-
 if (el.hostNextBtn) {
     el.hostNextBtn.addEventListener("click", async () => {
         if (!currentRoomId) return;
@@ -937,10 +1018,8 @@ if (el.hostEndBtn) {
 // ============================================================
 // COUNTDOWN TIMER (visual only — server is authoritative)
 // ============================================================
-
 function startQuestionTimer(startedAtTimestamp, seconds) {
     stopQuestionTimer();
-
     const startedAtMs = startedAtTimestamp?.toMillis?.() || Date.now();
     const endMs = startedAtMs + seconds * 1000;
 
@@ -953,7 +1032,6 @@ function startQuestionTimer(startedAtTimestamp, seconds) {
         if (el.timerCard.classList.contains("urgent") !== urgent) {
             el.timerCard.classList.toggle("urgent", urgent);
         }
-
         if (remaining <= 0) stopQuestionTimer();
     }
 
@@ -971,7 +1049,6 @@ function stopQuestionTimer() {
 // ============================================================
 // LIVE SCORES — DIFF-BASED
 // ============================================================
-
 function renderScoreList(room) {
     const players = Object.entries(room.players || {}).map(([uid, p]) => ({ uid, ...p }));
     players.sort((a, b) => (b.score || 0) - (a.score || 0));
@@ -997,7 +1074,6 @@ function renderScoreList(room) {
 // ============================================================
 // FINISHED VIEW
 // ============================================================
-
 function renderFinished(room) {
     stopQuestionTimer();
 
@@ -1021,16 +1097,34 @@ function renderFinished(room) {
 // ============================================================
 // NAVIGATION
 // ============================================================
-
 if (el.leaveRoomBtn) {
-    el.leaveRoomBtn.addEventListener("click", () => {
-        if (!confirm("Leave this room?")) return;
+    el.leaveRoomBtn.addEventListener("click", async () => {
+        if (!confirm("Leave this room? You won't be able to rejoin it automatically.")) return;
+
+        el.leaveRoomBtn.disabled = true;
+        el.leaveRoomBtn.textContent = "Leaving...";
+
+        try {
+            if (currentRoomId) {
+                await authFetch(`/api/rooms/${currentRoomId}/leave`, {
+                    method: "POST",
+                    body: JSON.stringify({})
+                });
+            }
+        } catch (err) {
+            console.warn("[rooms] Server leave failed:", err);
+        }
+
+        clearActiveRoom();          // ← important: stop auto-rejoin after explicit leave
         backToLobby();
+        el.leaveRoomBtn.disabled = false;
+        el.leaveRoomBtn.textContent = "Leave Room";
     });
 }
 
 if (el.backToLobbyBtn) {
     el.backToLobbyBtn.addEventListener("click", () => {
+        clearActiveRoom();          // finished room → clear
         backToLobby();
     });
 }
@@ -1043,7 +1137,6 @@ function backToLobby() {
 // ============================================================
 // MISC
 // ============================================================
-
 function escapeRegExp(str) {
     return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

@@ -495,3 +495,15 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   "Best: X" subtitle inside the STREAK card
+============================================================ */
+.stat-sub {
+    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.6px;
+    opacity: 0.7;
+}

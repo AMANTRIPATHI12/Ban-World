@@ -27,7 +27,8 @@
             <div class="header-actions">
                 <a href="rooms.html" class="rooms-nav-btn">Rooms</a>
 
-                <div class="auth-area" id="authArea">
+                <!-- hidden by default — revealed after Firebase Auth resolves -->
+                <div class="auth-area hidden" id="authArea">
                     <button id="googleSignInBtn" class="google-btn">
                         <span class="google-icon">G</span>
                         <span>Sign in</span>
@@ -52,6 +53,7 @@
             <div class="stat-card">
                 <span class="stat-label">STREAK</span>
                 <span id="streak" class="stat-value">0</span>
+                <span id="bestStreakMini" class="stat-sub">Best: 0</span>
             </div>
             <div class="stat-card">
                 <span class="stat-label">QUESTION</span>
